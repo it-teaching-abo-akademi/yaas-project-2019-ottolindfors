@@ -208,3 +208,10 @@ fabric.properties
 .idea/sonarlint
 
 # End of https://www.gitignore.io/api/django,pycharm
+
+# Other
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/.idea/yaas-project-2019-ottolindfors.iml

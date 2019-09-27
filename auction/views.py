@@ -15,6 +15,7 @@ def search(request):
 
 
 class CreateAuction(View):
+    # Do it in the same way as when creating a blog
     pass
 
 
