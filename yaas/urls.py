@@ -19,6 +19,7 @@ import user.views
 import auction.views
 import auction.services
 
+# These are tha main urls for the website
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auction/', include('auction.urls', namespace='auction')),

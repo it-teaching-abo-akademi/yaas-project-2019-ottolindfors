@@ -42,8 +42,8 @@ PREREQ_APPS = [
 ]
 
 PROJECT_APPS = [
-    'auction.apps.AuctionConfig',
-    'user.apps.UserConfig'
+    'auction.apps.AuctionConfig', # instead of just 'auction'
+    'user.apps.UserConfig',
 ]
 
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS
@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Helsinki'  # Other options like 'UTC'
 
 USE_I18N = True
 

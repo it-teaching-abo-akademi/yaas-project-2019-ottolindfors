@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from . import views
 
 
+# These are the (sub) urls after /auction/ url
 app_name = 'auction'
 urlpatterns = [
     path('', views.index, name='index'),
