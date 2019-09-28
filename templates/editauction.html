@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Auction</title>
+</head>
+<body>
+    <p><strong>Edit auction: {{ title }}</strong></p>
+    <form action="{% url "auction:edit" id%}" method="post">
+        {% csrf_token %}
+        <p>Title: <input type="text" name="title" id="title" value="{{ title }}"></p>
+        <p>Body: <textarea name="body" id="body" cols="30" rows="10">{{ body }}</textarea></p>
+        <input type="submit" value="Change">
+    </form>
+</body>
+</html>

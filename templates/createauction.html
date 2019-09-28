@@ -5,7 +5,7 @@
     <title>Create Auction</title>
 </head>
 <body>
-<form action={% url "auction:create" %} method="post"> <!-- method referes to the post() method in the views.CreateForm class -->
+<form action="{% url "auction:create" %}" method="post"> <!-- method referes to the post() method in the views.CreateForm class -->
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit">
