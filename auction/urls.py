@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-from . import views
+from . import views, rest_views
 
 
 # These are the (sub) urls after /auction/ url
@@ -13,5 +13,6 @@ urlpatterns = [
     # re_path(r'^edit/(\d+)/$', views.EditAuction.as_view(), name='edit'),    # url -> edit/digits
     re_path(r'^bid/(\d+)/$', views.bid, name='bid'),
     re_path(r'^ban/(\d+)$', views.ban, name='ban'),
-    path('resolve/', views.resolve, name='resolve')
+    path('resolve/', views.resolve, name='resolve'),
+    path('api/list/', rest_views.auction_list, name='rest-auction-list')
 ]
