@@ -39,12 +39,14 @@ class SignIn(View):
         # Else some user is found and we want to let the user login with the given credidentials
         else:
             auth.login(request, user)
-            messages.add_message(request, messages.INFO, "Welcome! Login successful.")
+            messages.add_message(request, messages.INFO, "Welcome! Signed in.")
             return HttpResponseRedirect(reverse("index"))
 
 
 def signout(request):
-    pass
+    auth.logout(request)
+    messages.add_message(request, messages.INFO, "Signed out.")
+    return HttpResponseRedirect(reverse("index"))
 
 
 class EditProfile(View):
