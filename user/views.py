@@ -1,4 +1,5 @@
 from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -43,6 +44,7 @@ class SignIn(View):
             return HttpResponseRedirect(reverse("index"))
 
 
+@login_required
 def signout(request):
     auth.logout(request)
     messages.add_message(request, messages.INFO, "Signed out.")

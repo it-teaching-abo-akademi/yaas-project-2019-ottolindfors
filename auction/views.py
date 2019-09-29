@@ -1,5 +1,7 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.http import HttpResponse, request, HttpResponseRedirect
 from django.urls import reverse
@@ -28,6 +30,7 @@ def search(request):
 
 
 # If the view is more complex and handles multiple request types then define it using a class
+@method_decorator(login_required, name='dispatch')
 class CreateAuction(View):
     def get(self, request):
         form = CreateAuctionForm()  # Create a blank form
@@ -51,6 +54,7 @@ class CreateAuction(View):
             return render(request, "createauction.html", {"form": form})    # Give a blank form to the user if the data was not valid
 
 
+@method_decorator(login_required, name='dispatch')
 class EditAuction(View):
     def get(self, request, id):
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
