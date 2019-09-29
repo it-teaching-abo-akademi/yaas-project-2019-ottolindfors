@@ -13,11 +13,14 @@ def index(request):
     print(auctions)  # debugging
     return render(request, "index.html", {"auctions": auctions})
 
-# def index(request):
-#     print(request.headers)
-#     print("creating response...")
-#     html = "<html><body>Hello! <br> <p> This was your request: %s %s <p> sent from the following browser: %s </body></html>" % (request.method, request.path, request.headers['User-Agent'])
-#     return HttpResponse(html)
+
+'''
+def index(request):
+    print(request.headers)
+    print("creating response...")
+    html = "<html><body>Hello! <br> <p> This was your request: %s %s <p> sent from the following browser: %s </body></html>" % (request.method, request.path, request.headers['User-Agent'])
+    return HttpResponse(html)
+'''
 
 
 def search(request):
@@ -51,7 +54,7 @@ class CreateAuction(View):
 class EditAuction(View):
     def get(self, request, id):
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
-        # auction = get_object_or_404(AuctionModel, id=id)
+        ''' auction = get_object_or_404(AuctionModel, id=id) '''
         if len(auctions) == 1:
             auction = auctions[0]
             # return the pre-filled form to the user for editing
