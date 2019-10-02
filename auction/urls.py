@@ -14,5 +14,4 @@ urlpatterns = [
     re_path(r'^bid/(\d+)/$', views.bid, name='bid'),
     re_path(r'^ban/(\d+)$', views.ban, name='ban'),
     path('resolve/', views.resolve, name='resolve'),
-    path('api/list/', rest_views.auction_list, name='rest-auction-list')
 ]

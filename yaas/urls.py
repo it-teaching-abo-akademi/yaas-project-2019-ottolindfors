@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.urls import path, re_path, include
 from django.contrib import admin
+from auction import rest_views
 import user.views
 import auction.views
 import auction.services
@@ -29,7 +30,8 @@ urlpatterns = [
     path('signin/', user.views.SignIn.as_view(), name='signin'),
     path('signout/', user.views.signout, name='signout'),
     path('changeLanguage/<lang_code>/', auction.views.changeLanguage, name='changeLanguage'),
-    path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency')
+    path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency'),
+    path('api/auction/list/', rest_views.auction_list, name='rest-auction-list')
 ]
 
 urlpatterns += [
