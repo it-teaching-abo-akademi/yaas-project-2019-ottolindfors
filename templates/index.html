@@ -16,7 +16,7 @@
 {% for auction in auctions %}
     <h2>{{ auction.title }}</h2>
     <p>{{ auction.id }}</p>
-    <p>{{ auction.body }}</p>
+    <p>{{ auction.description }}</p>
     <p>{{ auction.timestamp }}</p>
 {% empty %}
     <p>No auctions posted.</p>

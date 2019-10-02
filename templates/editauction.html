@@ -9,7 +9,7 @@
     <form action="{% url "auction:edit" id%}" method="post">
         {% csrf_token %}
         <p>Title: <input type="text" name="title" id="title" value="{{ title }}"></p>
-        <p>Body: <textarea name="body" id="body" cols="30" rows="10">{{ body }}</textarea></p>
+        <p>Description: <textarea name="description" id="body" cols="30" rows="10">{{ description }}</textarea></p>
         <input type="submit" value="Change">
     </form>
 </body>

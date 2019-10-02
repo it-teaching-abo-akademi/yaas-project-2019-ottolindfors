@@ -41,9 +41,9 @@ class CreateAuction(View):
         if form.is_valid():
             cdata = form.cleaned_data
             title = cdata["title"]
-            body = cdata["body"]
+            description = cdata["description"]
 
-            auction = AuctionModel(title=title, body=body)  # Create an auction, not saved anywhere yet
+            auction = AuctionModel(title=title, description=description)  # Create an auction, not saved anywhere yet
             auction.save()                                  # Save the auction to the database
 
             messages.add_message(request, messages.INFO, "Your auction was successfully added")
@@ -62,7 +62,8 @@ class EditAuction(View):
         if len(auctions) == 1:
             auction = auctions[0]
             # return the pre-filled form to the user for editing
-            return render(request, "editauction.html", {"user": request.user, "title": auction.title, "id": auction.id, "body": auction.body})  # add {{max_lentgh}}
+            return render(request, "editauction.html", {"user": request.user, "title": auction.title, "id": auction.id,
+                                                        "description": auction.description})  # add {{max_lentgh}}
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
             return HttpResponseRedirect(reverse("auction:index"))
@@ -76,9 +77,9 @@ class EditAuction(View):
             return HttpResponseRedirect(reverse("auction:index"))
 
         title = request.POST["title"].strip()   # get the title from the posted data
-        body = request.POST["body"].strip()     # get the body from the posted data
+        description = request.POST["description"].strip()  # get the description from the posted data
         auction.title = title
-        auction.body = body
+        auction.description = description
         auction.save()  # save the updated auction
 
         messages.add_message(request, messages.INFO, "Auction updated")
