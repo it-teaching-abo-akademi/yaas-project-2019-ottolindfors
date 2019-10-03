@@ -17,7 +17,10 @@
     <h2>{{ auction.title }}</h2>
     <p>{{ auction.id }}</p>
     <p>{{ auction.description }}</p>
-    <p>{{ auction.timestamp }}</p>
+    <p>{{ auction.minimum_price }}</p>
+    <p>{{ auction.status }}</p>
+    <p>Deadline: {{ auction.deadline }}</p>
+    <p>Created: {{ auction.timestamp }}</p>
 {% empty %}
     <p>No auctions posted.</p>
 {% endfor %}

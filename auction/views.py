@@ -11,7 +11,7 @@ from .forms import CreateAuctionForm
 
 # If the view is simple and handling only one request type then it is okay to define it using a function
 def index(request):
-    auctions = AuctionModel.objects.all()
+    auctions = AuctionModel.objects.filter(status='Active').order_by('deadline')  # nearest deadline first
     print(auctions)  # debugging
     return render(request, "index.html", {"auctions": auctions})
 
