@@ -5,15 +5,25 @@
     <title>Edit Auction</title>
 </head>
 <body>
-    <p><strong>Edit auction: {{ title }}</strong></p>
-    <form action="{% url "auction:edit" id%}" method="post">
-        {% csrf_token %}
-        <p>Title: <input type="text" name="title" id="title" value="{{ title }}"></p>
-        <p>Description: <textarea name="description" id="body" cols="30" rows="10">{{ description }}</textarea></p>
-        <p>Minimum price (not for editing): {{ minimum_price }}</p>
-        <p>Deadline (not for editing): {{ deadline }}</p>
-        <p>Status (not for editing): {{ status }}</p>
-        <input type="submit" value="Change">
-    </form>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<p><strong>Edit auction: {{ title }}</strong></p>
+
+<form action="{% url "auction:edit" id%}" method="post">
+    {% csrf_token %}
+    <p>Title: <input type="text" name="title" id="title" value="{{ title }}"></p>
+    <p>Description: <textarea name="description" id="body" cols="30" rows="10">{{ description }}</textarea></p>
+    <p>Minimum price (not for editing): {{ minimum_price }}</p>
+    <p>Deadline (not for editing): {{ deadline }}</p>
+    <p>Status (not for editing): {{ status }}</p>
+    <input type="submit" value="Change">
+</form>
+
 </body>
 </html>
