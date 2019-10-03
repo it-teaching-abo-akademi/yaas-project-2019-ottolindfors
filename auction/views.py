@@ -51,8 +51,13 @@ class EditAuction(View):
         if len(auctions) == 1:
             auction = auctions[0]
             # return the pre-filled form to the user for editing
-            return render(request, "editauction.html", {"user": request.user, "title": auction.title, "id": auction.id,
-                                                        "description": auction.description})  # add {{max_lentgh}}
+            return render(request, "editauction.html", {"user": request.user,
+                                                        "title": auction.title,
+                                                        "id": auction.id,
+                                                        "description": auction.description,
+                                                        "deadline": auction.deadline,
+                                                        "minimum_price": auction.minimum_price,
+                                                        "status": auction.status})  # add {{max_lentgh}}
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
             return HttpResponseRedirect(reverse("auction:index"))
