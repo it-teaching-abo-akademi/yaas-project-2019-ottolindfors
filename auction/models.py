@@ -9,7 +9,7 @@ class AuctionModel(models.Model):
     description = models.TextField()  # Body or description of the auction
     minimum_price = models.FloatField(default=0.0)
     timestamp = models.DateTimeField(auto_now_add=True)
-    deadline = models.DateTimeField(default=datetime.now())  # default=datetime.now()
+    deadline_date = models.DateTimeField(default=datetime.now())  # default=datetime.now()
     status = models.CharField(max_length=1024, default="Active")
 
 

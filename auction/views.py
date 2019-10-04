@@ -10,7 +10,7 @@ from .forms import CreateAuctionForm
 
 
 def index(request):
-    auctions = AuctionModel.objects.filter(status='Active').order_by('deadline')  # nearest deadline first
+    auctions = AuctionModel.objects.filter(status='Active').order_by('deadline_date')  # nearest deadline first
     print(auctions)  # debugging
     return render(request, "index.html", {"auctions": auctions})
 
@@ -20,7 +20,7 @@ def search(request):
         print("IF\n" + str(request.GET))
         criteria = request.GET["title"].lower().strip()
         searchid = request.GET["id"].lower().strip()
-        search_result = AuctionModel.objects.filter(title__contains=criteria, id__contains=searchid, status="Active").order_by('deadline')
+        search_result = AuctionModel.objects.filter(title__contains=criteria, id__contains=searchid, status="Active").order_by('deadline_date')
     else:
         print("ELSE\n" + str(request.GET))
         search_result = AuctionModel.objects.filter(status="Active").order_by('-timestamp')
@@ -40,7 +40,7 @@ class CreateAuction(View):
             new_auction = AuctionModel(title=cdata["title"],
                                    description=cdata["description"],
                                    minimum_price=cdata["minimum_price"],
-                                   deadline=cdata["deadline"])  # Create an auction, not saved anywhere yet
+                                   deadline_date=cdata["deadline_date"])  # Create an auction, not saved anywhere yet
             new_auction.save()  # Save the auction to the database
 
             messages.add_message(request, messages.INFO, "Your auction was successfully added")
@@ -63,7 +63,7 @@ class EditAuction(View):
                                                         "title": auction.title,
                                                         "id": auction.id,
                                                         "description": auction.description,
-                                                        "deadline": auction.deadline,
+                                                        "deadline_date": auction.deadline_date,
                                                         "minimum_price": auction.minimum_price,
                                                         "status": auction.status})  # add {{max_lentgh}}
         else:
