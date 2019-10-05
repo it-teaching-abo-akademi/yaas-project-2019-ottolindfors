@@ -16,6 +16,7 @@ Sending emails:
 
 Multiple Languages
     Tutorial: https://djangowaves.com/tutorial/multiple-languages-in-Django/
+    And follow up: https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
     Good explanation: https://stackoverflow.com/questions/10280881/django-site-with-2-languages#26520044
     Django docs: https://docs.djangoproject.com/en/2.2/topics/i18n/
 
