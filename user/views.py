@@ -4,20 +4,22 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
-from django.contrib.auth.forms import UserCreationForm
+
+from user.forms import UserCreationFormWithEmail
 
 
 class SignUp(View):
     def get(self, request):
-        form = UserCreationForm()
+        form = UserCreationFormWithEmail()
         return render(request, "signup.html", {"form": form})
 
     def post(self, request):
-        form = UserCreationForm(request.POST)
+        form = UserCreationFormWithEmail(request.POST)
         if form.is_valid():
-            new_user = form.save()  # Everything is handled by UserCreationForm. No need to implement database ourselves
-
+            new_user = form.save()  # Save the user with the save() function in UserCreationFormWithEmail
             messages.add_message(request, messages.INFO, "User created")
+            user_info = "username " + new_user.username + ", Email" + new_user.email
+            messages.add_message(request, messages.INFO, user_info)
             return HttpResponseRedirect(reverse("index"))
         else:
             messages.add_message(request, messages.INFO, "Please check that you use valid characters")

@@ -1,6 +1,8 @@
 Create a user account:
 - new user account using username (OK), email and password (OK).
 - to include email there are several resources:
+    https://version.aalto.fi/gitlab/kaistio1/wsd-project/commit/4b09c97f83ae41c235089cd5f3732890dca6b133
+    https://gist.github.com/schwuk/2725286
     https://docs.djangoproject.com/en/2.2/ref/contrib/auth/#manager-methods
     https://overiq.com/django-1-10/django-creating-users-using-usercreationform/
     https://stackoverflow.com/questions/10372877/how-to-create-a-user-in-django
