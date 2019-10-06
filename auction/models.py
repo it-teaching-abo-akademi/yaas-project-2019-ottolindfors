@@ -10,9 +10,9 @@ class AuctionModel(models.Model):
     description = models.TextField()  # Body or description of the auction
     minimum_price = models.FloatField(default=0.0)
     timestamp = models.DateTimeField(auto_now_add=True)
-    deadline_date = models.DateTimeField(default=datetime.now())  # default=datetime.now()
+    deadline_date = models.DateTimeField()  # was default=datetime.now()
     status = models.CharField(max_length=1024, default="Active")
-    seller = models.ForeignKey(User, on_delete=models.SET_NULL)
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     # seller = models.ForeignKey(SellerUserMap, on_delete=models.PROTECT)
     '''
     By default the AuctionModel instance (an auction) would be deleted if the User (seller) is deleted. To prevent this
@@ -38,6 +38,7 @@ def __str__(self):
 
 class Bid(models.Model):
     # An auction should not be deleted but on_delete=SET_NULL just in case
-    auction = models.ForeignKey(AuctionModel, on_delete=models.SET_NULL)
-    bidder = models.ForeignKey(User, on_delete=models.SET_NULL)
+    auction = models.ForeignKey(AuctionModel, on_delete=models.SET_NULL, null=True)
+    bidder = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     price = models.FloatField(default=0.0)
+    timestamp = models.DateTimeField(auto_now_add=True)
