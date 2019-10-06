@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -11,6 +12,8 @@ class AuctionModel(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     deadline_date = models.DateTimeField(default=datetime.now())  # default=datetime.now()
     status = models.CharField(max_length=1024, default="Active")
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    # seller = models.ForeignKey(SellerUserMap, on_delete=models.PROTECT)
 
 
 # Override default function __str__(self) to print a string presentation of the object instead of memory address
