@@ -32,7 +32,7 @@ https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#referencing-the-u
 
 
 class CustomUser(AbstractUser):
-    """custom CustomUser model that is used instead of django's built in User model"""
+    """custom CustomUser model that is used instead of django's built in User model. Email field is modified."""
     email = models.EmailField(
         _('email address'),
         unique=True,
