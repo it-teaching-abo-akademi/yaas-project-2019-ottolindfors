@@ -20,3 +20,6 @@ Multiple Languages
     Good explanation: https://stackoverflow.com/questions/10280881/django-site-with-2-languages#26520044
     Django docs: https://docs.djangoproject.com/en/2.2/topics/i18n/
 
+
+Confirm account creation with email (extra):
+    https://overiq.com/django-1-10/django-extending-user-model/
