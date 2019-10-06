@@ -22,7 +22,7 @@ class SignUp(View):
             messages.add_message(request, messages.INFO, user_info)
             return HttpResponseRedirect(reverse("index"))
         else:
-            messages.add_message(request, messages.INFO, "Please check that you use valid characters")
+            messages.add_message(request, messages.INFO, "This username has been taken.")
             return render(request, "signup.html", {"form": form})
 
 
