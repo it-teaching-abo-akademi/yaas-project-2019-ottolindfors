@@ -41,3 +41,12 @@ Custom User model (with unique email):
     default User model is sufficient for you. This model behaves identically to the default user model, but you’ll be
     able to customize it in the future if the need arises.
     https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
+
+
+Failing migrations:
+    https://stackoverflow.com/questions/44651760/django-db-migrations-exceptions-inconsistentmigrationhistory#48476148
+
+    Solution in my case:
+    1. go the nuclear route, i.e. delete database and the migrations files
+    2. run makemigrations
+    3. run migrate
