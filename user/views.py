@@ -18,11 +18,11 @@ class SignUp(View):
         if form.is_valid():
             new_user = form.save()  # Save the user with the save() function in UserCreationFormWithEmail
             messages.add_message(request, messages.INFO, "User created")
-            user_info = "username " + new_user.username + ", Email " + new_user.email
+            user_info = "username " + new_user.username + ", email " + new_user.email
             messages.add_message(request, messages.INFO, user_info)
             return HttpResponseRedirect(reverse("index"))
         else:
-            messages.add_message(request, messages.INFO, "This username has been taken.")
+            # messages.add_message(request, messages.INFO, "This username has been taken.")  # Required by UC1
             return render(request, "signup.html", {"form": form})
 
 

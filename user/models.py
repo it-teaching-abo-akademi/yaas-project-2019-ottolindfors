@@ -43,9 +43,8 @@ External Libraries
 
 class CustomUser(AbstractUser):
     """custom CustomUser model that is used instead of django's built in User model. Email field is modified."""
-    pass
-    # email = models.EmailField(
-    #     _('email address'),
-    #     unique=True,
-    #     error_messages={'unique': _("This email has been taken")}
-    # )
+    email = models.EmailField(
+        _('email address'),
+        unique=True,
+        error_messages={'unique': _("This email has been taken")}
+    )

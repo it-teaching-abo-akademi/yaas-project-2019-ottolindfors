@@ -50,3 +50,7 @@ Failing migrations:
     1. go the nuclear route, i.e. delete database and the migrations files
     2. run makemigrations
     3. run migrate
+
+
+Username already take Error Message:
+    user.views.SignUp() uncomment the message in post-method in else-statement.
