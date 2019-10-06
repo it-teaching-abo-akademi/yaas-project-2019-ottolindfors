@@ -47,10 +47,15 @@ class CreateAuction(View):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
             cdata = form.cleaned_data
-            new_auction = AuctionModel(title=cdata["title"],
-                                   description=cdata["description"],
-                                   minimum_price=cdata["minimum_price"],
-                                   deadline_date=cdata["deadline_date"])  # Create an auction, not saved anywhere yet
+            seller = request.user
+            print(seller.username)
+            new_auction = AuctionModel(
+                title=cdata["title"],
+                description=cdata["description"],
+                minimum_price=cdata["minimum_price"],
+                deadline_date=cdata["deadline_date"],
+                seller=seller
+            )  # Create an auction, not saved anywhere yet
             new_auction.save()  # Save the auction to the database
 
             messages.add_message(request, messages.INFO, "Your auction was successfully added")
@@ -69,13 +74,19 @@ class EditAuction(View):
         if len(auctions) == 1:
             auction = auctions[0]
             # return the pre-filled form to the user for editing
-            return render(request, "editauction.html", {"user": request.user,
-                                                        "title": auction.title,
-                                                        "id": auction.id,
-                                                        "description": auction.description,
-                                                        "deadline_date": auction.deadline_date,
-                                                        "minimum_price": auction.minimum_price,
-                                                        "status": auction.status})  # add {{max_lentgh}}
+            return render(
+                request,
+                "editauction.html",
+                {
+                    "user": request.user,
+                    "title": auction.title,
+                    "id": auction.id,
+                    "description": auction.description,
+                    "deadline_date": auction.deadline_date,
+                    "minimum_price": auction.minimum_price,
+                    "status": auction.status
+                }
+            )  # add {{max_lentgh}}
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
             return HttpResponseRedirect(reverse("auction:index"))

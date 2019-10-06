@@ -48,6 +48,8 @@ PROJECT_APPS = [
 
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS
 
+AUTH_USER_MODEL = 'user.CustomUser'  # custom CustomUser model to be used instead of django's built in User
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
