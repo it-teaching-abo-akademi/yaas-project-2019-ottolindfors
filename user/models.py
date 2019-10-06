@@ -28,13 +28,24 @@ and https://www.fomfus.com/articles/how-to-use-email-as-username-for-django-auth
 Referencing the User model (e.g. FOREIGN KEY) should be done with django.contrib.auth.get_user_model()
 https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#referencing-the-user-model
     
+    
+4. 
+Migration files are stored in:
+External Libraries 
+> Python 3.6 (yaas-...) 
+> site-packages
+> django
+> contrib
+> auth
+> migrations
 '''
 
 
 class CustomUser(AbstractUser):
     """custom CustomUser model that is used instead of django's built in User model. Email field is modified."""
-    email = models.EmailField(
-        _('email address'),
-        unique=True,
-        error_messages={'unique': _("This email has been taken")}
-    )
+    pass
+    # email = models.EmailField(
+    #     _('email address'),
+    #     unique=True,
+    #     error_messages={'unique': _("This email has been taken")}
+    # )
