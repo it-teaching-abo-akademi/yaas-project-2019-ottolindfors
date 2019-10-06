@@ -20,3 +20,7 @@ Multiple Languages
     Good explanation: https://stackoverflow.com/questions/10280881/django-site-with-2-languages#26520044
     Django docs: https://docs.djangoproject.com/en/2.2/topics/i18n/
 
+
+Get user id:
+    https://stackoverflow.com/questions/12615154/how-to-get-the-currently-logged-in-users-user-id-in-django
+
