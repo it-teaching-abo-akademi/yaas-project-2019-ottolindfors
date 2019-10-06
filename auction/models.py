@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 
 
@@ -12,7 +12,8 @@ class AuctionModel(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     deadline_date = models.DateTimeField(default=datetime.now())  # default=datetime.now()
     status = models.CharField(max_length=1024, default="Active")
-    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    # ForeignKey references the currently active User model (CustomUser) via settings.AUTH_USER_MODEL
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     # seller = models.ForeignKey(SellerUserMap, on_delete=models.PROTECT)
 
 
