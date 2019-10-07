@@ -1,9 +1,26 @@
 [
     {
-        "ISSUE":"001",
+        "ISSUE": "001",
+        "STATUS": "OPEN",
+        "METHOD": "user.views.SignUp.post()",
+        "EXPECTED_BEHAVIOUR": "Sign up with valid data, return code 302 (redirect).",
+        "DESCRIPTION_OF_ISSUE": "Status code is 200 according to testTDD.py",
+        "SOLUTION": ""
+    },
+    {
+        "ISSUE":"002",
         "STATUS":"OPEN",
-        "METHOD":"user.views.SignUp.post()",
-        "EXPECTED_BEHAVIOUR":"Sign up with valid data, return code 302 (redirect).",
-        "DESCRIPTION_OF_ISSUE":"Status code is 200 according to testTDD.py"
+        "METHOD":"user.views.SignIn.post()",
+        "EXPECTED_BEHAVIOUR":"UC3 tests pass: ..._with_invalid_deadline_date_format, _with_invalid_minimum_price, _get_create_auction_form.",
+        "DESCRIPTION_OF_ISSUE":"Tests are unable to sign in. Perhaps something to do with CustomUser. Tests pass when removing @require_login from CreateAuction view. EditAuction test in UC4 pass though. _get_create_auction_form gives AssertionError 302!=200 probably signin that fails.",
+        "SOLUTION": "Wrong error messages?"
+    },
+    {
+        "ISSUE":"003",
+        "STATUS":"OPEN",
+        "METHOD":"testTDD.test_get_create_auction_form",
+        "EXPECTED_BEHAVIOUR":"Return form for creating an auction and code 200",
+        "DESCRIPTION_OF_ISSUE":"Test fails. Gets code 302. In browser I get code 200.",
+        "SOLUTION": ""
     }
 ]

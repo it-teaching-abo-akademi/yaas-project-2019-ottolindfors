@@ -58,6 +58,7 @@ class CreateAuction(View):
 
 @method_decorator(login_required, name='dispatch')
 class EditAuction(View):
+    # TODO: Users can only edit their own auctions
     def get(self, request, id):
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
         ''' auction = get_object_or_404(AuctionModel, id=id) '''
