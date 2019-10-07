@@ -16,6 +16,7 @@ def index(request):
 
 
 def search(request):
+    # TODO: return search results as json?
     if request.GET.get("term") != "":  # search by title
         print("IF\n" + str(request.GET))
         criteria = request.GET["term"].lower().strip()
@@ -37,8 +38,7 @@ class CreateAuction(View):
         if form.is_valid():
             cdata = form.cleaned_data
             # TODO: Check that minimum deadline date is valid and also minimum price.
-            seller = request.user
-            print(seller.username)
+            seller = request.user  # print(seller.username)
             new_auction = AuctionModel(
                 title=cdata["title"],
                 description=cdata["description"],
@@ -58,46 +58,61 @@ class CreateAuction(View):
 
 @method_decorator(login_required, name='dispatch')
 class EditAuction(View):
-    # TODO: Users can only edit their own auctions
     def get(self, request, id):
+        # TODO: Users can only get their own auctions
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
-        ''' auction = get_object_or_404(AuctionModel, id=id) '''
+
+        # Only one auction found (as should)
         if len(auctions) == 1:
             auction = auctions[0]
-            # return the pre-filled form to the user for editing
-            return render(
-                request,
-                "editauction.html",
-                {
-                    "user": request.user,
-                    "title": auction.title,
-                    "id": auction.id,
-                    "description": auction.description,
-                    "deadline_date": auction.deadline_date,
-                    "minimum_price": auction.minimum_price,
-                    "status": auction.status
-                }
-            )  # add {{max_lentgh}}
+
+            # Check ownership of auction
+            # Must use username since they are both the same type (str)
+            if request.user.username == auction.seller.username:
+                # return the pre-filled form to the user for editing
+                return render(
+                    request,
+                    "editauction.html",
+                    {
+                        "user": request.user,
+                        "title": auction.title,
+                        "id": auction.id,
+                        "description": auction.description,
+                        "deadline_date": auction.deadline_date,
+                        "minimum_price": auction.minimum_price,
+                        "status": auction.status
+                    }
+                )
+            else:
+                messages.add_message(request, messages.INFO, "That is not your auction to edit")
+                return HttpResponseRedirect(reverse("index"))
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
-            return HttpResponseRedirect(reverse("auction:index"))
+            return HttpResponseRedirect(reverse("index"))
 
     def post(self, request, id):
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
         if len(auctions) == 1:
             auction = auctions[0]
+
+            # Check ownership of auction
+            # Must use username since they are both the same type (str)
+            if request.user.username == auction.seller.username:
+                title = request.POST["title"].strip()  # get the title from the posted data
+                description = request.POST["description"].strip()  # get the description from the posted data
+                auction.title = title
+                auction.description = description
+
+                auction.save()  # save the updated auction
+
+                messages.add_message(request, messages.INFO, "Auction has been updated successfully")
+                return HttpResponseRedirect(reverse("index"))
+            else:
+                messages.add_message(request, messages.INFO, "That is not your auction")
+                return HttpResponseRedirect(reverse("index"))
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
-            return HttpResponseRedirect(reverse("auction:index"))
-
-        title = request.POST["title"].strip()   # get the title from the posted data
-        description = request.POST["description"].strip()  # get the description from the posted data
-        auction.title = title
-        auction.description = description
-        auction.save()  # save the updated auction
-
-        messages.add_message(request, messages.INFO, "Auction updated")
-        return HttpResponseRedirect(reverse("auction:index"))
+            return HttpResponseRedirect(reverse("index"))
 
 
 def bid(request, item_id):

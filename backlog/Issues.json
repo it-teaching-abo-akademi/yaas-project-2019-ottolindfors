@@ -22,5 +22,21 @@
         "EXPECTED_BEHAVIOUR":"Return form for creating an auction and code 200",
         "DESCRIPTION_OF_ISSUE":"Test fails. Gets code 302. In browser I get code 200.",
         "SOLUTION": ""
+    },
+    {
+        "ISSUE":"004",
+        "STATUS":"OPEN",
+        "METHOD":"testTDD",
+        "EXPECTED_BEHAVIOUR":"Sign in successful",
+        "DESCRIPTION_OF_ISSUE":"Is not able to sign in. For example UC4 test_edit_an_auction_of_other_user. Read html it shows in error",
+        "SOLUTION": ""
+    },
+    {
+        "ISSUE":"005",
+        "STATUS":"OPEN",
+        "METHOD":"testTDD UC5",
+        "EXPECTED_BEHAVIOUR":"Human readable search result",
+        "DESCRIPTION_OF_ISSUE":"testTDD wnats a JSON search result",
+        "SOLUTION": ""
     }
 ]

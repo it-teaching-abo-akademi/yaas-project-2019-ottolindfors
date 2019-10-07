@@ -23,7 +23,7 @@ class SignUp(View):
             messages.add_message(request, messages.INFO, user_info)
             # Sign in the user for ease of use
             auth.login(request, new_user)
-            return redirect('index')  # Issue 001: does not give Http status code 302 (gives 200)
+            return redirect('index')  # Issue 001
         else:
             messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
             return render(request, "signup.html", {"form": form})
