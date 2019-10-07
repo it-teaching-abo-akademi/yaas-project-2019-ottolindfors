@@ -23,17 +23,6 @@ def search(request):
     else:
         print("ELSE\n" + str(request.GET))
         search_result = AuctionModel.objects.filter(status="Active").order_by('-timestamp')
-
-    # if (request.GET.get("title") != "") or (request.GET.get("id") != ""):  # Search by title and/or id
-    #     print("IF\n" + str(request.GET))
-    #     criteria = request.GET["title"].lower().strip()
-    #     searchid = request.GET["id"].lower().strip()
-    #     search_result = AuctionModel.objects.filter(title__contains=criteria,
-    #                                                 id__contains=searchid, status="Active").order_by('deadline_date')
-    # else:
-    #     print("ELSE\n" + str(request.GET))
-    #     search_result = AuctionModel.objects.filter(status="Active").order_by('-timestamp')
-
     return render(request, "index.html", {"auctions": search_result})
 
 
