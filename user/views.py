@@ -30,9 +30,16 @@ class SignUp(View):
 
 
 class SignIn(View):
+
     def get(self, request):
         # Prevent phishing attacks. Check that redirect is safe if present un the url (?next=)
-        destination_safe = is_safe_url(self.request.GET.get('next'), allowed_hosts=None)  # No external links/redirects are allowed
+        destination = self.request.GET.get('next')
+        destination_safe = is_safe_url(destination, allowed_hosts=None)
+
+        # If no redirect
+        if destination is None:
+            destination_safe = True
+
         if destination_safe:
             return render(request, "signin.html")
         else:
@@ -55,9 +62,17 @@ class SignIn(View):
         else:
             # Login the user and
             # Safely redirect the user according to ?next= in the url the form was get:ted with
+
             destination = self.request.GET.get('next')
             destination_safe = is_safe_url(destination, allowed_hosts=None)  # No external links are allowed (phishing)
-            if destination is not None and destination_safe:
+
+            # Determine if safe to login (no external redirect attempt)
+            if destination is None:
+                # Log in the user
+                auth.login(request, user)
+                messages.add_message(request, messages.INFO, "Welcome! Signed in.")
+                return redirect('index')
+            elif destination is not None and destination_safe:
                 # Log in the user
                 auth.login(request, user)
                 messages.add_message(request, messages.INFO, "Welcome! Signed in.")
