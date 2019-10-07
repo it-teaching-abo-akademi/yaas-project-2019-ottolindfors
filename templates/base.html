@@ -1,0 +1,36 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<h1>Erwin's Auctions</h1>
+<h2>You never know what you are going to get</h2>
+
+{% if user.is_authenticated %}
+    <ul>
+        <li><a href="{% url "signout" %}">Sign out</a></li>
+        <li><a href="{% url "index" %}">Home</a></li>
+        <li><a href="{% url "auction:create" %}">Create Auction</a></li>
+    </ul>
+    <p>Signed in as {{ user.username }}</p>
+{% else %}
+    <ul>
+        <li><a href="{% url "signin" %}">Sign in</a></li>
+        <li><a href="{% url "signup" %}">Sign up</a></li>
+        <li><a href="{% url "index" %}">Home</a></li>
+    </ul>
+{% endif %}
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tag }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

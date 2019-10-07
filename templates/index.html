@@ -1,30 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Auctions</title>
 </head>
-<body>
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
 
-{% for auction in auctions %}
-    <h2>{{ auction.title }}</h2>
-    <p>{{ auction.id }}</p>
-    <p>{{ auction.description }}</p>
-    <p>{{ auction.minimum_price }}</p>
-    <p>{{ auction.status }}</p>
-    <p>Seller: {{ auction.seller }}</p>
-    <p>Deadline: {{ auction.deadline_date }}</p>
-    <p>Created: {{ auction.timestamp }}</p>
-{% empty %}
-    <p>No auctions posted.</p>
-{% endfor %}
+<body>
+
+    <h2>Auctions</h2>
+
+    {% for auction in auctions %}
+        <h2>{{ auction.title }}</h2>
+        <p>{{ auction.id }}</p>
+        <p>{{ auction.description }}</p>
+        <p>{{ auction.minimum_price }}</p>
+        <p>{{ auction.status }}</p>
+        <p>Seller: {{ auction.seller }}</p>
+        <p>Deadline: {{ auction.deadline_date }}</p>
+        <p>Created: {{ auction.timestamp }}</p>
+    {% empty %}
+        <p>No auctions posted.</p>
+    {% endfor %}
 
 </body>
 </html>
+
+{% endblock %}

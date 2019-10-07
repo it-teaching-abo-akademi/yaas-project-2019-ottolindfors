@@ -20,6 +20,8 @@ class SignUp(View):
             messages.add_message(request, messages.INFO, "User created")
             user_info = "username " + new_user.username + ", email " + new_user.email
             messages.add_message(request, messages.INFO, user_info)
+            # Sign in the user for ease of use
+            auth.login(request, new_user)
             return HttpResponseRedirect(reverse("index"))
         else:
             messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1

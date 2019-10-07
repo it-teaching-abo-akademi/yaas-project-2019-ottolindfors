@@ -47,6 +47,7 @@ class CreateAuction(View):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
             cdata = form.cleaned_data
+            # TODO: Check that minimum deadline date is valid and also minimum price.
             seller = request.user
             print(seller.username)
             new_auction = AuctionModel(
@@ -58,7 +59,7 @@ class CreateAuction(View):
             )  # Create an auction, not saved anywhere yet
             new_auction.save()  # Save the auction to the database
 
-            messages.add_message(request, messages.INFO, "Your auction was successfully added")
+            messages.add_message(request, messages.INFO, "Auction has been created successfully")
             return HttpResponseRedirect(reverse("index"))   # Redirect the user after successful auction post
         else:
             messages.add_message(request, messages.INFO, "We tried everything. Looks like the data you gave us was "

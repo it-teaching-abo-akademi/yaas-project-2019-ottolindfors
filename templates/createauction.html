@@ -1,24 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Create Auction</title>
 </head>
+
 <body>
 
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+    <h2>Create auction</h2>
 
-<form action="{% url "auction:create" %}" method="post"> <!-- method referes to the post() method in the views.CreateForm class -->
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
+    <form action="{% url "auction:create" %}" method="post"> <!-- method referes to the post() method in the views.CreateForm class -->
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
 
 </body>
 </html>
+
+{% endblock %}

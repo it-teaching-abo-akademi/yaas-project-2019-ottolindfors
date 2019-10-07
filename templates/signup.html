@@ -1,26 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Sign Up</title>
 </head>
+
 <body>
 
-<h2>Create account</h2>
+    <h2>Create account</h2>
 
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li {% if message.tags %} class="{{ message.tag }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-<form action="{% url "signup" %}" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
+    <form action="{% url "signup" %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
 
 </body>
 </html>
+
+{% endblock %}
