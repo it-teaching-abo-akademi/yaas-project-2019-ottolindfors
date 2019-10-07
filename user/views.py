@@ -1,7 +1,7 @@
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
@@ -22,7 +22,7 @@ class SignUp(View):
             messages.add_message(request, messages.INFO, user_info)
             # Sign in the user for ease of use
             auth.login(request, new_user)
-            return HttpResponseRedirect(reverse("index"))
+            return redirect('index')
         else:
             messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
             return render(request, "signup.html", {"form": form})
