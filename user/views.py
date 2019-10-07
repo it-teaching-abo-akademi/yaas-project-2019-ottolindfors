@@ -22,7 +22,7 @@ class SignUp(View):
             messages.add_message(request, messages.INFO, user_info)
             return HttpResponseRedirect(reverse("index"))
         else:
-            # messages.add_message(request, messages.INFO, "This username has been taken.")  # Required by UC1
+            messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
             return render(request, "signup.html", {"form": form})
 
 
