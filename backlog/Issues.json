@@ -5,7 +5,7 @@
         "METHOD": "user.views.SignUp.post()",
         "EXPECTED_BEHAVIOUR": "Sign up with valid data, return code 302 (redirect).",
         "DESCRIPTION_OF_ISSUE": "Status code is 200 according to testTDD.py",
-        "SOLUTION": ""
+        "SOLUTION": "Potential solution. Try not to use CustomUser but instead manually check if the email already exist in the CreateAuction(View)"
     },
     {
         "ISSUE":"002",

@@ -1,15 +1,13 @@
+from datetime import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.http import HttpResponse, request, HttpResponseRedirect
 from django.urls import reverse
-from rest_framework.decorators import renderer_classes, api_view
-from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
 
-from auction.serializers import AuctionSerializer
 from .models import AuctionModel
 from .forms import CreateAuctionForm
 
@@ -21,7 +19,7 @@ def index(request):
 
 
 def search(request):
-    # TODO: return search results as json?
+    # TODO: return search results as json? See commented below
     if request.GET.get("term") != "":  # search by title
         print("IF\n" + str(request.GET))
         criteria = request.GET["term"].lower().strip()
@@ -49,32 +47,69 @@ def search(request):
         pass
 """
 
+
 @method_decorator(login_required, name='dispatch')
 class CreateAuction(View):
     def get(self, request):
         form = CreateAuctionForm()  # Create a blank form
         return render(request, "createauction.html", {"form": form})
 
+    # TODO: Check minimum price.
     def post(self, request):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
+            print("here")
             cdata = form.cleaned_data
-            # TODO: Check that minimum deadline date is valid and also minimum price.
-            seller = request.user  # print(seller.username)
-            new_auction = AuctionModel(
-                title=cdata["title"],
-                description=cdata["description"],
-                minimum_price=cdata["minimum_price"],
-                deadline_date=cdata["deadline_date"],
-                seller=seller
-            )  # Create an auction, not saved anywhere yet
-            new_auction.save()  # Save the auction to the database
+            minimum_price = cdata["minimum_price"]
+            deadline_date = cdata["deadline_date"]
 
-            messages.add_message(request, messages.INFO, "Auction has been created successfully")
-            return HttpResponseRedirect(reverse("index"))   # Redirect the user after successful auction post
+            cdata_is_valid = True
+
+            # Validate minimum price
+            if minimum_price < 0.01:
+                cdata_is_valid = False
+                messages.add_message(request, messages.INFO, "Ensure this value is greater than or equal to 0.01")
+
+            # Validate format of deadline_date
+            try:
+                datetime.strftime(deadline_date, '%d.%m.%Y %H:%M:%S')
+            except ValueError:
+                cdata_is_valid = False
+                messages.add_message(request, messages.INFO, "Enter a valid date/time")
+
+            # Validate deadline_date
+            t1 = deadline_date
+            t2 = timezone.localtime(timezone.now())
+            if t1-t2 < timedelta(hours=72):
+                cdata_is_valid = False
+                messages.add_message(request, messages.INFO, "The deadline date should be at least 72 hours from now")
+
+            # Create auction or return form
+            if cdata_is_valid:
+                seller = request.user
+                new_auction = AuctionModel(
+                    title=cdata["title"],
+                    description=cdata["description"],
+                    minimum_price=cdata["minimum_price"],
+                    deadline_date=cdata["deadline_date"],
+                    seller=seller
+                )
+
+                # Save the auction to the database
+                new_auction.save()
+
+                messages.add_message(request, messages.INFO, "Auction has been created successfully")
+                return redirect('index')
+            else:
+                messages.add_message(request, messages.INFO, "Please check your entries")
+                return render(request, "createauction.html", {"form": form})
+
         else:
-            messages.add_message(request, messages.INFO, "We tried everything. Looks like the data you gave us was "
-                                                         "invalid.")
+            messages.add_message(
+                request,
+                messages.INFO,
+                "We tried everything. Looks like the data you gave us was invalid."
+            )
             return render(request, "createauction.html", {"form": form})  # Give a blank form to the user if the data was not valid
 
 
