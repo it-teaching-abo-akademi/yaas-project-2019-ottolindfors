@@ -5,6 +5,11 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.http import HttpResponse, request, HttpResponseRedirect
 from django.urls import reverse
+from rest_framework.decorators import renderer_classes, api_view
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+
+from auction.serializers import AuctionSerializer
 from .models import AuctionModel
 from .forms import CreateAuctionForm
 
@@ -26,6 +31,23 @@ def search(request):
         search_result = AuctionModel.objects.filter(status="Active").order_by('-timestamp')
     return render(request, "index.html", {"auctions": search_result})
 
+
+"""
+# Returning JSON search result does not pass test
+@api_view(["GET"])  # Only apply to GET requests
+@renderer_classes([JSONRenderer])   # Only return JSON format, not XML or other
+def search(request):
+    if request.GET.get("term") != "":
+        print("IF\n" + str(request.GET))  # debugging
+        criteria = request.GET["term"].lower().strip()
+        # Search result
+        auctions = AuctionModel.objects.filter(title__contains=criteria, status="Active").order_by('deadline_date')
+        # Serialize data
+        auctions_serialized = AuctionSerializer(auctions, many=True)
+        return Response(auctions_serialized.data)
+    else:
+        pass
+"""
 
 @method_decorator(login_required, name='dispatch')
 class CreateAuction(View):
