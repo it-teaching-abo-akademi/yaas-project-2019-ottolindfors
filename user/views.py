@@ -10,21 +10,31 @@ from user.forms import UserCreationFormWithEmail
 
 
 class SignUp(View):
+
     def get(self, request):
+        print("Signup get")
         form = UserCreationFormWithEmail()
         return render(request, "signup.html", {"form": form})
 
     def post(self, request):
+        print("Signup post method")
         form = UserCreationFormWithEmail(request.POST)
+
         if form.is_valid():
+            print("Signup post method if form.is_valid()")
+
             new_user = form.save()  # Save the user with the save() function in UserCreationFormWithEmail
             messages.add_message(request, messages.INFO, "User created")
             user_info = "username " + new_user.username + ", email " + new_user.email
             messages.add_message(request, messages.INFO, user_info)
             # Sign in the user for ease of use
             auth.login(request, new_user)
+
+            print("Signup post: " + new_user.username)
+
             return redirect('index')  # Issue 001
         else:
+            print("Signup post method else")
             messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
             return render(request, "signup.html", {"form": form})
 
@@ -54,12 +64,23 @@ class SignIn(View):
         username = request.POST.get('username', '')  # Empty '' tells the get method to return '' if username not found
         password = request.POST.get('password', '')  # Is this secure?
 
+        # Debugging
+        print("Signin post request: " + username)
+        print("Signin post request: " + password)
+
         user = auth.authenticate(username=username, password=password)
 
+        # Debugging
+        if user is not None:
+            print("Signin post authenticated user: " + user.username)
+            print("Signin post authenticated user: " + user.password)
+
         if user is None:
+            print("Signin post if user is None")
             messages.add_message(request, messages.INFO, "Invalid username or password")
             return render(request, "signin.html")
         else:
+            print("Signin post else (users exists)")
             # Login the user and
             # Safely redirect the user according to ?next= in the url the form was get:ted with
 

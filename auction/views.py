@@ -54,7 +54,6 @@ class CreateAuction(View):
         form = CreateAuctionForm()  # Create a blank form
         return render(request, "createauction.html", {"form": form})
 
-    # TODO: Check minimum price.
     def post(self, request):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
