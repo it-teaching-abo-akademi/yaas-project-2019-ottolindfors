@@ -54,3 +54,7 @@ Failing migrations:
 
 Username already take Error Message:
     user.views.SignUp() uncomment the message in post-method in else-statement.
+
+
+Forms cleaned_data
+    What it is? Answer: https://docs.djangoproject.com/en/dev/ref/forms/api/#django.forms.Form.cleaned_data

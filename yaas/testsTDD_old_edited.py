@@ -47,6 +47,7 @@ class UC1_SignUpTests(TestCase):
         """
         Get signup form, return status code 200
         """
+        print('test_get_sign_up_form')
         response = self.client.get(reverse("signup"))
         self.assertEqual(response.status_code, 200)
 
@@ -58,6 +59,7 @@ class UC1_SignUpTests(TestCase):
         REQ1.1
         Sign up without a password and email, should return status code 200
         """
+        print('test_sign_up_with_invalid_data')
         context = {
             "username": "testUser3",
         }
@@ -73,6 +75,7 @@ class UC1_SignUpTests(TestCase):
         REQ1.1
         Sign up with valid username and password, should return status code 302
         """
+        print('test_sign_up_with_valid_data')
         context = {
             "username": "testUser3",
             "password": "123",
@@ -90,6 +93,7 @@ class UC1_SignUpTests(TestCase):
         REQ1.1
         Sign up with already taken username, should return status code 400.
         """
+        print('test_sign_up_with_invalid_username')
         context = {
             "username": "testUser1",
             "password": "333",
@@ -111,6 +115,7 @@ class UC1_SignUpTests(TestCase):
         REQ1.1
         Sign up with already taken email, should return status code 400.
         """
+        print('test_sign_up_with_invalid_email')
         user1Info = {
             "username": "testUser1",
             "password": "123",
@@ -275,6 +280,7 @@ class UC3_CreateAuctionTests(TestCase):
         REQ3.2
         Create auction with deadline date is earlier than current date, show error message
         """
+        print('test_create_auction_with_invalid_deadline_date')
         data = {
             "title": "newItem",
             "description": "something",
