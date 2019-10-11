@@ -8,9 +8,10 @@
 
 {% if user.is_authenticated %}
     <ul>
-        <li><a href="{% url "signout" %}">Sign out</a></li>
         <li><a href="{% url "index" %}">Home</a></li>
         <li><a href="{% url "auction:create" %}">Create Auction</a></li>
+        <li><a href="{% url "user:editprofile" %}">Edit profile</a></li>
+        <li><a href="{% url "signout" %}">Sign out</a></li>
     </ul>
     <p>Signed in as {{ user.username }}</p>
 {% else %}
