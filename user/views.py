@@ -6,106 +6,104 @@ from django.urls import reverse
 from django.utils.http import is_safe_url
 from django.views import View
 
-from user.forms import UserCreationFormWithEmail
+from user.forms import CustomUserCreationForm
 
 
 class SignUp(View):
 
     def get(self, request):
-        print("Signup get")
-        form = UserCreationFormWithEmail()
-        return render(request, "signup.html", {"form": form})
+        safe_deastination = safeRedirectDestination(request)
+        if safe_deastination:
+            form = CustomUserCreationForm()
+            return render(request, "signup.html", {"form": form})
+        else:
+            messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
+            return redirect("index")
 
     def post(self, request):
-        print("Signup post method")
-        form = UserCreationFormWithEmail(request.POST)
+        safe_destination = safeRedirectDestination(request)
 
-        if form.is_valid():
-            print("Signup post method if form.is_valid()")
+        # TODO: Check with Postman that this is working
+        if safe_destination:
+            form = CustomUserCreationForm(request.POST)
 
-            new_user = form.save()  # Save the user with the save() function in UserCreationFormWithEmail
-            messages.add_message(request, messages.INFO, "User created")
-            user_info = "username " + new_user.username + ", email " + new_user.email
-            messages.add_message(request, messages.INFO, user_info)
-            # Sign in the user for ease of use
-            auth.login(request, new_user)
+            if form.is_valid():
+                # Save the user with the save() function in CustomUserCreationForm
+                new_user = form.save()
 
-            print("Signup post: " + new_user.username)
+                # Messages
+                messages.add_message(request, messages.INFO, "User created")
+                user_info = "username " + new_user.username + ", email " + new_user.email
+                messages.add_message(request, messages.INFO, user_info)
 
-            return redirect('index')  # Issue 001
+                # Sign in the user for ease of use
+                auth.login(request, new_user)
+
+                return redirect('index')  # Issue 001
+            else:
+                messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
+                return render(request, "signup.html", {"form": form})
         else:
-            print("Signup post method else")
-            messages.add_message(request, messages.INFO, "This username has been taken, or This email has been taken")  # Required by UC1
-            return render(request, "signup.html", {"form": form})
+            messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
+            return redirect("index")
 
 
 class SignIn(View):
 
     def get(self, request):
-        # Prevent phishing attacks. Check that redirect is safe if present un the url (?next=)
-        destination = self.request.GET.get('next')
-        destination_safe = is_safe_url(destination, allowed_hosts=None)
+        safe_destination = safeRedirectDestination(request)
 
-        # If no redirect
-        if destination is None:
-            destination_safe = True
-
-        if destination_safe:
+        if safe_destination:
             return render(request, "signin.html")
         else:
-            messages.add_message(
-                request,
-                messages.INFO,
-                "Back to safety! The url you used contained a malicious attempt to redirect you to another site. "
-                "Be careful of the urls you use when signing in. :)")
+            messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
             return redirect("index")
 
     def post(self, request):
-        username = request.POST.get('username', '')  # Empty '' tells the get method to return '' if username not found
-        password = request.POST.get('password', '')  # Is this secure?
+        safe_destination = safeRedirectDestination(request)
 
-        # Debugging
-        print("Signin post request: " + username)
-        print("Signin post request: " + password)
+        # TODO: Check with Postman that this is working
+        if safe_destination:
+            username = request.POST.get('username', '')  # Empty '' tells the get method to return '' if username not found
+            password = request.POST.get('password', '')  # Is this secure?
 
-        user = auth.authenticate(username=username, password=password)
+            user = auth.authenticate(username=username, password=password)
 
-        # Debugging
-        if user is not None:
-            print("Signin post authenticated user: " + user.username)
-            print("Signin post authenticated user: " + user.password)
-
-        if user is None:
-            print("Signin post if user is None")
-            messages.add_message(request, messages.INFO, "Invalid username or password")
-            return render(request, "signin.html")
-        else:
-            print("Signin post else (users exists)")
-            # Login the user and
-            # Safely redirect the user according to ?next= in the url the form was get:ted with
-
-            destination = self.request.GET.get('next')
-            destination_safe = is_safe_url(destination, allowed_hosts=None)  # No external links are allowed (phishing)
-
-            # Determine if safe to login (no external redirect attempt)
-            if destination is None:
-                # Log in the user
-                auth.login(request, user)
-                messages.add_message(request, messages.INFO, "Welcome! Signed in.")
-                return redirect('index')
-            elif destination is not None and destination_safe:
-                # Log in the user
-                auth.login(request, user)
-                messages.add_message(request, messages.INFO, "Welcome! Signed in.")
-                return redirect(destination)
+            if user is None:
+                # Invalid username or password
+                messages.add_message(request, messages.INFO, "Invalid username or password")
+                return render(request, "signin.html")
             else:
-                # Return to safety
-                messages.add_message(
-                    request,
-                    messages.INFO,
-                    "Back to safety! The url you used contained a malicious attempt to redirect you to another site. "
-                    "Be careful of the urls you use when signing in. :)")
-                return redirect("index")
+                # Log in the user
+                auth.login(request, user)
+
+                messages.add_message(request, messages.INFO, "Welcome! Signed in.")
+                print("SIGNED IN")
+
+                destination = request.GET.get('next')
+                if destination is None:
+                    return redirect('index')
+                else:
+                    return redirect(destination)
+        else:
+            # Return to safety
+            messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
+            return redirect("index")
+
+
+def safeRedirectDestination(request):
+    # Prevent phishing attacks. Check that redirect is safe if present un the url (?next=)
+    destination = request.GET.get('next')
+    destination_safe = is_safe_url(destination, allowed_hosts=None)
+
+    # If no redirect
+    if destination is None:
+        destination_safe = True  # prevent destination_safe == False
+
+    if destination_safe:
+        return True
+    else:
+        return False
 
 
 @login_required
