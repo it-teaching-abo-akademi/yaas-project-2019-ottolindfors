@@ -139,3 +139,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 # Urls
 
 LOGIN_URL = 'signin'  # This is the one in yaas/urls
+
+# Email backend for testing email. Does not actually send email. Stores them in mail.outbox
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'

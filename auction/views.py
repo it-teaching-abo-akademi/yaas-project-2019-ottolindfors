@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import mail
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -57,47 +58,49 @@ class CreateAuction(View):
     def post(self, request):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
-            print("here")
             cdata = form.cleaned_data
-            minimum_price = cdata["minimum_price"]
-            deadline_date = cdata["deadline_date"]
-
             cdata_is_valid = True
 
             # Validate minimum price
-            if minimum_price < 0.01:
+            if cdata["minimum_price"] < 0.01:
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "Ensure this value is greater than or equal to 0.01")
-
-            # Validate format of deadline_date
+            # Validate format of deadline_date (is also done in form)
             try:
-                datetime.strftime(deadline_date, '%d.%m.%Y %H:%M:%S')
+                datetime.strftime(cdata["deadline_date"], '%d.%m.%Y %H:%M:%S')
             except ValueError:
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "Enter a valid date/time")
-
             # Validate deadline_date
-            t1 = deadline_date
-            t2 = timezone.localtime(timezone.now())
-            if t1-t2 < timedelta(hours=72):
+            time_now = timezone.localtime(timezone.now())
+            if cdata["deadline_date"] - time_now < timedelta(hours=72):
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "The deadline date should be at least 72 hours from now")
 
             # Create auction or return form
             if cdata_is_valid:
-                seller = request.user
+                # TODO: Ask for user confirmation. According to Dragos L5-Security.pdf
                 new_auction = AuctionModel(
                     title=cdata["title"],
                     description=cdata["description"],
                     minimum_price=cdata["minimum_price"],
                     deadline_date=cdata["deadline_date"],
-                    seller=seller
+                    seller=request.user
                 )
-
                 # Save the auction to the database
                 new_auction.save()
+                # Send a dummy email
+                subject = 'Your auction'
+                edit_link = '127.0.0.1:8000/auction/edit/' + str(new_auction.id) + '/no-signin'
+                message = 'Auction has been created successfully. Use this link to edit your auction ' + edit_link
+                sender = 'bot@erwin.com'
+                request.user.email_user(subject=subject, message=message, from_email=sender)
 
                 messages.add_message(request, messages.INFO, "Auction has been created successfully")
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    "Email has been sent to you. Edit the description of your auction without signin in at " + edit_link)
                 return redirect('index')
             else:
                 messages.add_message(request, messages.INFO, "Please check your entries")
@@ -115,13 +118,10 @@ class CreateAuction(View):
 @method_decorator(login_required, name='dispatch')
 class EditAuction(View):
     def get(self, request, id):
-        # TODO: Users can only get their own auctions
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
-
         # Only one auction found (as should)
         if len(auctions) == 1:
             auction = auctions[0]
-
             # Check ownership of auction
             # Must use username since they are both the same type (str)
             if request.user.username == auction.seller.username:
@@ -150,25 +150,52 @@ class EditAuction(View):
         auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
         if len(auctions) == 1:
             auction = auctions[0]
-
             # Check ownership of auction
             # Must use username since they are both the same type (str)
             if request.user.username == auction.seller.username:
-                title = request.POST["title"].strip()  # get the title from the posted data
-                description = request.POST["description"].strip()  # get the description from the posted data
-                auction.title = title
-                auction.description = description
-
-                auction.save()  # save the updated auction
-
+                auction.title = request.POST["title"].strip()
+                auction.description = request.POST["description"].strip()
+                # save the updated auction
+                auction.save()
                 messages.add_message(request, messages.INFO, "Auction has been updated successfully")
-                return HttpResponseRedirect(reverse("index"))
+                return redirect(reverse("index"))
             else:
                 messages.add_message(request, messages.INFO, "That is not your auction")
-                return HttpResponseRedirect(reverse("index"))
+                return redirect(reverse("index"))
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
-            return HttpResponseRedirect(reverse("index"))
+            return redirect(reverse("index"))
+
+
+class EditAuctionNoSignIn(View):
+    def get(self, request, id):
+        auctions = AuctionModel.objects.filter(id=id)
+        if len(auctions) == 1:
+            auction = auctions[0]
+            return render(
+                request,
+                "editauction-no-signin.html",
+                {
+                    "title": auction.title,
+                    "id": auction.id,
+                    "description": auction.description
+                }
+            )
+        else:
+            messages.add_message(request, messages.INFO, "Invalid auction id")
+            return redirect(reverse("index"))
+
+    def post(self, request, id):
+        auctions = AuctionModel.objects.filter(id=id)
+        if len(auctions) == 1:
+            auction = auctions[0]
+            auction.description = request.POST.get("description", auction.description).strip()  # no change if failure
+            auction.save()
+            messages.add_message(request, messages.INFO, "Auction updated successfully")
+            return redirect("index")
+        else:
+            messages.add_message(request, messages.INFO, "Invalid auction id")
+            return redirect(reverse("index"))
 
 
 def bid(request, item_id):
