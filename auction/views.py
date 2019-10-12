@@ -72,14 +72,13 @@ class CreateAuction(View):
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "Enter a valid date/time")
             # Validate deadline_date
-            time_now = timezone.localtime(timezone.now())
-            if cdata["deadline_date"] - time_now < timedelta(hours=72):
+            if cdata["deadline_date"] - timezone.localtime(timezone.now()) < timedelta(hours=72):
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "The deadline date should be at least 72 hours from now")
 
             # Create auction or return form
             if cdata_is_valid:
-                # TODO: Ask for user confirmation. According to Dragos L5-Security.pdf
+                # TODO: (Addittional) Improve security on user confirmation. According to Dragos L5-Security.pdf
                 new_auction = AuctionModel(
                     title=cdata["title"],
                     description=cdata["description"],
