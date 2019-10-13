@@ -7,7 +7,8 @@ from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.views import View
 
-from user.forms import CustomUserCreationForm, EditUserForm
+from user.forms import CustomUserCreationForm, CustomUserEditForm
+from user.models import CustomUser
 
 
 class SignUp(View):
@@ -131,16 +132,88 @@ def signout(request):
 class EditProfile(View):
     def get(self, request):
         safe_destination = safeRedirectDestination(request)
-
         if safe_destination:
-            # Give editing form to the user
-            print("user: " + request.user.username)
-            form = EditUserForm(request.POST, instance=request.user)
+            form = CustomUserEditForm(instance=request.user)
             return render(request, "editprofile.html", {"form": form})
         else:
             messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
             return redirect("index")
 
-
     def post(self, request):
-        pass
+        safe_destination = safeRedirectDestination(request)
+        if safe_destination:
+            new_email = request.POST.get('email', '').strip()
+            new_password = request.POST.get('password', '').strip()
+            print('old email: ' + request.user.email)
+            print('new email: ' + new_email)
+            print('new password: ' + new_password)
+            save = False
+            user_in_db = CustomUser.objects.get(username=request.user.username)
+            if new_email != '':
+                # Check if email is taken
+                email_available = False
+                if CustomUser.objects.filter(email=new_email).count() == 0:
+                    email_available = True
+                else:
+                    users = CustomUser.objects.filter(email=new_email).values_list('username', flat=True)
+                    if len(users) == 1 and users[0] == request.user.username:
+                        email_available = True
+                if email_available:
+                    print('email avalible')
+                    user_in_db.email = new_email
+                    save = True
+                    messages.add_message(request, messages.INFO, "new email")
+                else:
+                    messages.add_message(request, messages.INFO, "email taken")
+                    # return HttpResponseRedirect(reverse('user:editprofile'))
+                    return redirect('user:editprofile')  # no status code 200 since not using a django form
+            if new_password != '':
+                user_in_db.set_password(new_password)
+                save = True
+                messages.add_message(request, messages.INFO, "new password")
+            if save:
+                user_in_db.save()
+                auth.login(request, user_in_db)  # Sign in user in case password has changed (to pass testTDD)
+                messages.add_message(request, messages.INFO, "User info saved")
+                return redirect('index')
+            else:
+                messages.add_message(request, messages.INFO, "User info not saved")
+                return redirect('index')
+        else:
+            messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
+            return redirect("index")
+
+        # TODO: Figure outh why hte form will not validate
+        # if safe_destination:
+        #     new_email = request.POST.get('email', '').strip()
+        #     new_password = request.POST.get('password', '').strip()
+        #     print('.' + new_email + '.', '.' + new_password + '.')
+        #     user_in_db = CustomUser.objects.filter(username=request.user.username)
+        #     update = False
+        #     if new_email != '' and new_password != '':
+        #         print('#')
+        #         form = CustomUserEditForm({'email': new_email, 'password': new_password}, instance=user_in_db)
+        #         update = True
+        #     elif new_email != '' and new_password == '':
+        #         print('##')
+        #         form = CustomUserEditForm({'email': new_email}, instance=user_in_db)
+        #         update = True
+        #     elif new_email == '' and new_password != '':
+        #         print('## #')
+        #         form = CustomUserEditForm({'password': new_password}, instance=user_in_db)
+        #         update = True
+        #
+        #     if update:
+        #         print('## ##')
+        #         if form.is_valid():
+        #             print('## ## #')
+        #             form.save()
+        #             messages.add_message(request, messages.INFO, "Profile updated")
+        #             return redirect('index')
+        #     else:
+        #         print('## ## ##')
+        #         messages.add_message(request, messages.INFO, "Nothing updated")
+        #         return redirect('index')
+        # else:
+        #     messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
+        #     return redirect("index")

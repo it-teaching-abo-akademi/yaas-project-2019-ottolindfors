@@ -1,0 +1,31 @@
+UC1_SignUpTests
+- test_get_sign_up_form (PASSED)
+- test_sign_up_with_invalid_data (PASSED)
+- test_sign_up_with_invalid_email (PASSED)
+- test_sign_up_with_invalid_username (PASSED)
+- test_sign_up_with_valid data (PASSED)
+
+UC2_EditProfileTests
+- test_edit_email_and_password_of_an_authenticated_user (PASSED)
+- test_edit_email_that_alseady_taken (Full functionality implemented. Not getting status code 200 since not using django form)
+- test_get_profile_of_authenticated_user (PASSED)
+- test_get_profile_of_unauthenticated_user (PASSED)
+
+UC3_CreateAuctionTests
+- test_create_auction_with_invalid_deadline_date (PASSED)
+- test_create_auction_with_invalid_deadline_date_format (PASSED)
+- test_create_auction_with_invalid_minimum_price (PASSED)
+- test_create_auction_with_sending_email (PASSED)
+- test_create_auction_with_unauthenticated_user (PASSED)
+- test_create_auction_with_valid_data (PASSED)
+- test_get_create_auction_form (PASSED)
+
+UC4_EditAuctionTests
+- test_edit_an_auction_of_other_user (PASSED)
+- test_edit_auction_with_valid_description (PASSED)
+- test_get_an_auction_of_other_user (PASSED)
+- test_get_an_auction_successfully (PASSED)
+
+UC5_BrowseAndSearchTests
+- test_browse_for_active_auctions (PASSED)
+- test_search_for_auctions_by_title (PASSED)
