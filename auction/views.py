@@ -128,8 +128,9 @@ class CreateAuction(View):
 @method_decorator(login_required, name='dispatch')
 class EditAuction(View):
     def get(self, request, id):
-        auctions = AuctionModel.objects.filter(token=id)   # returns an array of matches
+        auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
         # Only one auction found (as should)
+        print(len(auctions))
         if len(auctions) == 1:
             auction = auctions[0]
             # Check ownership of auction
