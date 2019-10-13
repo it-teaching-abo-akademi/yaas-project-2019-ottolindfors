@@ -17,7 +17,8 @@
         <h2>{{ auction.title }}</h2>
         <p>{{ auction.id }}</p>
         <p>{{ auction.description }}</p>
-        <p>{{ auction.minimum_price }}</p>
+        <p>Starting price: {{ auction.minimum_price }}</p>
+        <p>Current price: {{ auction.current_price }}</p>
         <p>{{ auction.status }}</p>
         <p>Seller: {{ auction.seller }}</p>
         <p>Deadline: {{ auction.deadline_date }}</p>

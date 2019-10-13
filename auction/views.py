@@ -90,6 +90,7 @@ class CreateAuction(View):
                     title=cdata["title"],
                     description=cdata["description"],
                     minimum_price=cdata["minimum_price"],
+                    current_price=cdata["minimum_price"],
                     deadline_date=cdata["deadline_date"],
                     token=token,
                     seller=request.user

@@ -9,16 +9,24 @@ class AuctionModel(models.Model):
     title = models.CharField(max_length=255)    # Title of the auction
     description = models.TextField()  # Body or description of the auction
     minimum_price = models.FloatField(default=0.0)
+    current_price = models.FloatField(default=0.0)
     timestamp = models.DateTimeField(auto_now_add=True)
     deadline_date = models.DateTimeField(default=datetime.now)  # default=datetime.now()
-    status = models.CharField(max_length=1024, default="Active")
+    status = models.CharField(max_length=1024, default="Active")  # Active, Banned, Due, Adjudicated
     token = models.CharField(max_length=255, unique=True, null=True)
     # ForeignKey references the currently active User model (CustomUser) via settings.AUTH_USER_MODEL
-    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    # seller = models.ForeignKey(SellerUserMap, on_delete=models.PROTECT)
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
+    # seller = models.ForeignKey(SellerUserMap, on_delete=models.SET_NULL)
 
 
 # Override default function __str__(self) to print a string presentation of the object instead of memory address
 def __str__(self):
     return self.title
 
+
+# class Bid(models.Model):
+#     auction_id = models.ForeignKey('AuctionModel', on_delete=models.PROTECT)
+#     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     amount = models.FloatField(default=0.0)
+#
