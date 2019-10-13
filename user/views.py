@@ -1,4 +1,5 @@
 from django.contrib import messages, auth
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -173,6 +174,7 @@ class EditProfile(View):
                 messages.add_message(request, messages.INFO, "new password")
             if save:
                 user_in_db.save()
+                update_session_auth_hash(request, user_in_db)  # Sign out (invalidate) all sessions
                 auth.login(request, user_in_db)  # Sign in user in case password has changed (to pass testTDD)
                 messages.add_message(request, messages.INFO, "User info saved")
                 return redirect('index')
