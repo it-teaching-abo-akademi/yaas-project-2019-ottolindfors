@@ -13,10 +13,9 @@
 
     <h2>Edit auction</h2>
 
-    <p><strong>Editing auction: {{ title }}</strong></p>
-    <p>Not very secure, I know...</p>
+    <p><strong>Without signing in you can only change the description.</strong></p>
 
-    <form action="{% url "auction:edit-no-signin" id%}" method="post">
+    <form action="{% url "auction:edit-no-signin" token%}" method="post">
         {% csrf_token %}
         <p>Title: {{ title }}</p>
         <p>Description: <textarea name="description" id="body" cols="30" rows="10">{{ description }}</textarea></p>

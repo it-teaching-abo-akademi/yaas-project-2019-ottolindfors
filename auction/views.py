@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -79,23 +80,33 @@ class CreateAuction(View):
             # Create auction or return form
             if cdata_is_valid:
                 # TODO: (Addittional) Improve security on user confirmation. According to Dragos L5-Security.pdf
+                # Create token unique for editing without login
+                token = str(uuid.uuid4())
+                while len(AuctionModel.objects.filter(token=token)) != 0:
+                    token = str(uuid.uuid4())
+                    print('Generated another token: ' + token)
+                # Create auction
                 new_auction = AuctionModel(
                     title=cdata["title"],
                     description=cdata["description"],
                     minimum_price=cdata["minimum_price"],
                     deadline_date=cdata["deadline_date"],
+                    token=token,
                     seller=request.user
                 )
                 # Save the auction to the database
                 new_auction.save()
                 # Send a dummy email
                 subject = 'Your auction'
-                edit_link = '127.0.0.1:8000/auction/edit/' + str(new_auction.id) + '/no-signin'
+                edit_link = '127.0.0.1:8000/auction/edit/no-signin/' + token
                 message = 'Auction has been created successfully. Use this link to edit your auction ' + edit_link
                 sender = 'bot@erwin.com'
                 request.user.email_user(subject=subject, message=message, from_email=sender)
-
-                messages.add_message(request, messages.INFO, "Auction has been created successfully")
+                # Add messages
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    "Auction has been created successfully")
                 messages.add_message(
                     request,
                     messages.INFO,
@@ -117,7 +128,7 @@ class CreateAuction(View):
 @method_decorator(login_required, name='dispatch')
 class EditAuction(View):
     def get(self, request, id):
-        auctions = AuctionModel.objects.filter(id=id)   # returns an array of matches
+        auctions = AuctionModel.objects.filter(token=id)   # returns an array of matches
         # Only one auction found (as should)
         if len(auctions) == 1:
             auction = auctions[0]
@@ -167,8 +178,8 @@ class EditAuction(View):
 
 
 class EditAuctionNoSignIn(View):
-    def get(self, request, id):
-        auctions = AuctionModel.objects.filter(id=id)
+    def get(self, request, token):
+        auctions = AuctionModel.objects.filter(token=token)
         if len(auctions) == 1:
             auction = auctions[0]
             return render(
@@ -176,16 +187,16 @@ class EditAuctionNoSignIn(View):
                 "editauction-no-signin.html",
                 {
                     "title": auction.title,
-                    "id": auction.id,
+                    "token": auction.token,
                     "description": auction.description
                 }
             )
         else:
-            messages.add_message(request, messages.INFO, "Invalid auction id")
+            messages.add_message(request, messages.INFO, "Invalid auction token")
             return redirect(reverse("index"))
 
-    def post(self, request, id):
-        auctions = AuctionModel.objects.filter(id=id)
+    def post(self, request, token):
+        auctions = AuctionModel.objects.filter(token=token)
         if len(auctions) == 1:
             auction = auctions[0]
             auction.description = request.POST.get("description", auction.description).strip()  # no change if failure
@@ -193,7 +204,7 @@ class EditAuctionNoSignIn(View):
             messages.add_message(request, messages.INFO, "Auction updated successfully")
             return redirect("index")
         else:
-            messages.add_message(request, messages.INFO, "Invalid auction id")
+            messages.add_message(request, messages.INFO, "Invalid auction token")
             return redirect(reverse("index"))
 
 
