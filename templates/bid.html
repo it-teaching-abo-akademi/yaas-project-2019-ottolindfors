@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bid</title>
+</head>
+
+<body>
+
+    <h2>Bid on auction</h2>
+
+    <form action="{% url "auction:bid" %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+</html>
+
+{% endblock %}

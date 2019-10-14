@@ -22,13 +22,18 @@ class CustomUserCreationForm(ModelForm):
         return user
 
 
-class CustomUserEditForm(ModelForm):
+class CustomUserEditForm2(ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False)  # Make input invisible in browser
     email = forms.EmailField(required=False)
 
     class Meta:
         model = CustomUser
         fields = ('email', 'password')
+
+
+class CustomUserEditForm(forms.Form):
+    email = forms.EmailField(required=False)
+    password = forms.CharField(widget=forms.PasswordInput, required=False)  # Make input invisible in browser
 
 
 # class SignInForm

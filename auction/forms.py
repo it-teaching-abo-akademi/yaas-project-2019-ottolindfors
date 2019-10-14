@@ -1,4 +1,7 @@
 from django import forms
+from django.db.models import Max
+
+
 
 
 class CreateAuctionForm(forms.Form):
@@ -11,3 +14,16 @@ class CreateAuctionForm(forms.Form):
         help_text="Give the date as dd.mm.yyyy HH:MM:SS",
         label="Deadline"
     )
+
+
+# class BidForm(forms.Form):
+#     new_price = forms.FloatField()
+
+# class BidForm(forms.ModelForm):
+#     class Meta:
+#         model = BidModel
+#         fields = ('new_price',)
+#
+#     def save(self, commit=True):
+#         bid = super(BidForm, self).save(commit=False)
+#

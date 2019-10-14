@@ -134,7 +134,9 @@ class EditProfile(View):
     def get(self, request):
         safe_destination = safeRedirectDestination(request)
         if safe_destination:
-            form = CustomUserEditForm(instance=request.user)
+            # form = CustomUserEditForm(instance=request.user)
+            initial_data = {'email': request.user.email, 'password': ''}
+            form = CustomUserEditForm(initial=initial_data)
             return render(request, "editprofile.html", {"form": form})
         else:
             messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
@@ -143,44 +145,85 @@ class EditProfile(View):
     def post(self, request):
         safe_destination = safeRedirectDestination(request)
         if safe_destination:
-            new_email = request.POST.get('email', '').strip()
-            new_password = request.POST.get('password', '').strip()
-            print('old email: ' + request.user.email)
-            print('new email: ' + new_email)
-            print('new password: ' + new_password)
-            save = False
-            user_in_db = CustomUser.objects.get(username=request.user.username)
-            if new_email != '':
-                # Check if email is taken
-                email_available = False
-                if CustomUser.objects.filter(email=new_email).count() == 0:
-                    email_available = True
-                else:
-                    users = CustomUser.objects.filter(email=new_email).values_list('username', flat=True)
-                    if len(users) == 1 and users[0] == request.user.username:
+            form = CustomUserEditForm(request.POST)
+            if form.is_valid():
+                cdata = form.cleaned_data
+                new_email = cdata['email']
+                new_password = cdata['password']
+                print('new email: ' + new_email)
+                print('new password: ' + new_password)
+                save = False
+                user_in_db = CustomUser.objects.get(username=request.user.username)
+                # TODO: Return form instead of index
+                if new_email != '':
+                    # Check if email is taken
+                    email_available = False
+                    if not CustomUser.objects.filter(email=new_email).exists():
                         email_available = True
-                if email_available:
-                    print('email avalible')
-                    user_in_db.email = new_email
+                    else:
+                        users = CustomUser.objects.filter(email=new_email).values_list('username', flat=True)
+                        if len(users) == 1 and users[0] == request.user.username:
+                            email_available = True
+                    if email_available:
+                        print('email avalible')
+                        user_in_db.email = new_email
+                        save = True
+                        messages.add_message(request, messages.INFO, "new email")
+                    else:
+                        messages.add_message(request, messages.INFO, "email taken")
+                        # return HttpResponseRedirect(reverse('user:editprofile'))
+                        return redirect('user:editprofile')  # no status code 200 since not using a django form
+                if new_password != '':
+                    user_in_db.set_password(new_password)
                     save = True
-                    messages.add_message(request, messages.INFO, "new email")
+                    messages.add_message(request, messages.INFO, "new password")
+                if save:
+                    user_in_db.save()
+                    update_session_auth_hash(request, user_in_db)  # Sign out (invalidate) all sessions
+                    auth.login(request, user_in_db)  # Sign in user in case password has changed (to pass testTDD)
+                    messages.add_message(request, messages.INFO, "User info saved")
+                    return redirect('index')
                 else:
-                    messages.add_message(request, messages.INFO, "email taken")
-                    # return HttpResponseRedirect(reverse('user:editprofile'))
-                    return redirect('user:editprofile')  # no status code 200 since not using a django form
-            if new_password != '':
-                user_in_db.set_password(new_password)
-                save = True
-                messages.add_message(request, messages.INFO, "new password")
-            if save:
-                user_in_db.save()
-                update_session_auth_hash(request, user_in_db)  # Sign out (invalidate) all sessions
-                auth.login(request, user_in_db)  # Sign in user in case password has changed (to pass testTDD)
-                messages.add_message(request, messages.INFO, "User info saved")
-                return redirect('index')
-            else:
-                messages.add_message(request, messages.INFO, "User info not saved")
-                return redirect('index')
+                    messages.add_message(request, messages.INFO, "User info not saved")
+                    return redirect('index')
+            # new_email = request.POST.get('email', '').strip()
+            # new_password = request.POST.get('password', '').strip()
+            # print('old email: ' + request.user.email)
+            # print('new email: ' + new_email)
+            # print('new password: ' + new_password)
+            # save = False
+            # user_in_db = CustomUser.objects.get(username=request.user.username)
+            # if new_email != '':
+            #     # Check if email is taken
+            #     email_available = False
+            #     if CustomUser.objects.filter(email=new_email).count() == 0:
+            #         email_available = True
+            #     else:
+            #         users = CustomUser.objects.filter(email=new_email).values_list('username', flat=True)
+            #         if len(users) == 1 and users[0] == request.user.username:
+            #             email_available = True
+            #     if email_available:
+            #         print('email avalible')
+            #         user_in_db.email = new_email
+            #         save = True
+            #         messages.add_message(request, messages.INFO, "new email")
+            #     else:
+            #         messages.add_message(request, messages.INFO, "email taken")
+            #         # return HttpResponseRedirect(reverse('user:editprofile'))
+            #         return redirect('user:editprofile')  # no status code 200 since not using a django form
+            # if new_password != '':
+            #     user_in_db.set_password(new_password)
+            #     save = True
+            #     messages.add_message(request, messages.INFO, "new password")
+            # if save:
+            #     user_in_db.save()
+            #     update_session_auth_hash(request, user_in_db)  # Sign out (invalidate) all sessions
+            #     auth.login(request, user_in_db)  # Sign in user in case password has changed (to pass testTDD)
+            #     messages.add_message(request, messages.INFO, "User info saved")
+            #     return redirect('index')
+            # else:
+            #     messages.add_message(request, messages.INFO, "User info not saved")
+            #     return redirect('index')
         else:
             messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
             return redirect("index")

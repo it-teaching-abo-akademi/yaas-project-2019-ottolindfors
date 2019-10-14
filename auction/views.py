@@ -10,7 +10,7 @@ from django.views import View
 from django.http import HttpResponse, request, HttpResponseRedirect
 from django.urls import reverse
 
-from .models import AuctionModel
+from .models import AuctionModel, BidModel
 from .forms import CreateAuctionForm
 
 
@@ -22,7 +22,7 @@ def index(request):
 
 def search(request):
     # TODO: return search results as json? See commented below
-    if request.GET.get("term") != "":  # search by title
+    if request.GET.get("term", "") != "":  # search by title
         print("IF\n" + str(request.GET))
         criteria = request.GET["term"].lower().strip()
         search_result = AuctionModel.objects.filter(title__contains=criteria, status="Active").order_by('deadline_date')
@@ -95,6 +95,10 @@ class CreateAuction(View):
                     token=token,
                     seller=request.user
                 )
+                # TODO: Ask for confirmation
+                # Save to session
+                # redirect to confirmaion
+
                 # Save the auction to the database
                 new_auction.save()
                 # Send a dummy email
@@ -210,11 +214,69 @@ class EditAuctionNoSignIn(View):
             return redirect(reverse("index"))
 
 
+@login_required
 def bid(request, item_id):
-    pass
+    if request.method == 'POST':
+        if AuctionModel.objects.filter(id=item_id).exists():
+            new_price = float(request.POST.get('new_price_input', 0.00))
+            buyer = request.user
+            auction = AuctionModel.objects.filter(id=item_id)[0]
+            # TODO: Check that new_price is valid
+            # TODO: Check that user is not seller
+            new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
+            new_bid.save()
+            return redirect('index')
+        else:
+            messages.add_message(request, messages.INFO, "Invalid auction id")
+            return redirect('index')
+    else:
+        messages.add_message(request, messages.INFO, "GET method not avalible")
+        return redirect('index')
+
+
+# @method_decorator(login_required, name='dispatch')
+# class Bid(View):
+#     def get(self, request, item_id):
+#         errors = False
+#         try:
+#             auction = AuctionModel.objects.get(id=item_id)
+#         except AuctionModel.DoesNotExist:
+#             errors = True
+#             messages.add_message(request, messages.INFO, "Invalid auction id")
+#         # Check that user is not trying to bid on own auction
+#         if not errors:
+#             if request.user.username == auction.seller.username:
+#                 # put new_price into the form before sending it to the user
+#                 form = BidForm()  # Create a blank form
+#                 return render(request, "bid.html", {"form": form, "auction": auction})
+#             else:
+#                 messages.add_message(request, messages.INFO, "You cannot bid on your own auctions")
+#                 return redirect('index')
+#         else:
+#             return redirect('index')
+#
+#     def post(self, request, item_id):
+#         # POST /auction/bid/2
+#         # { “new_price”: 15 }
+#         auction = AuctionModel.objects.get(id=item_id)
+#         print(auction)
+
+
+class ConfirmAuction(View):
+    def get(self, request):
+        pass
+        # give a html/forom with yes button
+
+    def post(self, request):
+        pass
+        # if yes is posted to us then:
+        # new_auction = get_from_session()
+        # new_auction.save()
+
 
 
 def ban(request, item_id):
+    # TODO: Just set auction.status=Banned
     pass
 
 
@@ -230,3 +292,11 @@ def changeCurrency(request, currency_code):
     pass
 
 
+def save_to_session(request, new_auction):
+    request.session['new_auction'] = new_auction
+
+
+def get_from_session(reqest):
+    title = request.session['title']
+    # return new_auction
+    pass

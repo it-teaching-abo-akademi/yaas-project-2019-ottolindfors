@@ -23,6 +23,17 @@
         <p>Seller: {{ auction.seller }}</p>
         <p>Deadline: {{ auction.deadline_date }}</p>
         <p>Created: {{ auction.timestamp }}</p>
+        <form action="{% url 'auction:bid' auction.id %}" method="post">
+            {% csrf_token %}
+            <input type="number" min="{{ auction.current_price }}" step="0.01" name="new_price_input" value="{{ auction.current_price }}">
+            <input type="submit" value="Bid">
+        </form>
+        {% if request.user.is_superuser and auction.status == 'Active'%}
+            {% csrf_token %}
+            <form action="{% url 'auction:ban' auction.id %}" method="post">
+            <input type="submit" value="Ban">
+        </form>
+        {% endif %}
     {% empty %}
         <p>No auctions posted.</p>
     {% endfor %}

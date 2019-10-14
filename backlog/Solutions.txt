@@ -68,3 +68,27 @@ Edit user:
 
 Signin not working:
     Could it be that since signin does not use a form but instead just a signin.html the data cannot be posted anywhere?
+
+OneToOne field in model rather than ForeignKey:
+    https://stackoverflow.com/questions/5870537/whats-the-difference-between-django-onetoonefield-and-foreignkey
+    https://docs.djangoproject.com/en/dev/ref/models/fields/#module-django.db.models.fields.related
+    https://docs.djangoproject.com/en/dev/topics/db/examples/one_to_one/
+
+    ForeignKey: many-to-one relation
+    One manufactuerer can have many cars (or one auction can have many bids, one user can have many bids, one user can have many auctions)
+
+        class Car(models.Model):
+            manufacturer = models.ForeignKey('Manufacturer')
+            # ...
+        class Manufacturer(models.Model):
+            # ...
+
+    Many-to-Many:
+        https://docs.djangoproject.com/en/dev/topics/db/examples/many_to_many/
+
+    One-to-One:
+        https://docs.djangoproject.com/en/dev/topics/db/examples/one_to_one/
+
+
+DB Queries:
+    https://docs.djangoproject.com/en/2.2/topics/db/queries/
