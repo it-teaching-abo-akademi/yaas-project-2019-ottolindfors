@@ -71,18 +71,9 @@ class SignIn(View):
         if safe_destination:
             username = request.POST.get('username', '')  # Empty '' tells the get method to return '' if username not found
             password = request.POST.get('password', '')  # Is this secure?
-            email = request.POST.get('email', '')
 
-            print('username: .' + username + '.')
-            print('password: .' + password + '.')
-            print('email: .' + email + '.')
-
-            # TODO: Figure out why testTDD always get user=None although username and password are correct
             user = auth.authenticate(username=username, password=password)
 
-            print('Signin SIGNED IN: ' + str(user))
-
-            print('user : .' + str(user) + '.')
             if user is None:
                 # Invalid username or password
                 messages.add_message(request, messages.INFO, "Invalid username or password")

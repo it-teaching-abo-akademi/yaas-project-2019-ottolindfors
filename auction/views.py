@@ -1,5 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
+from decimal import *
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import mail
@@ -17,7 +19,7 @@ from .forms import CreateAuctionForm
 def index(request):
     auctions = AuctionModel.objects.filter(status='Active').order_by('deadline_date')  # nearest deadline first
     print(auctions)  # debugging
-    return render(request, "index.html", {"auctions": auctions})
+    return render(request, "index.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
 
 
 def search(request):
@@ -90,7 +92,6 @@ class CreateAuction(View):
                     title=cdata["title"],
                     description=cdata["description"],
                     minimum_price=cdata["minimum_price"],
-                    current_price=cdata["minimum_price"],
                     deadline_date=cdata["deadline_date"],
                     token=token,
                     seller=request.user
@@ -216,50 +217,54 @@ class EditAuctionNoSignIn(View):
 
 @login_required
 def bid(request, item_id):
+    # TODO: testTDD require response to be status code 200 --> HttpResponse(error_message, content_type='text/plain')
+    #  In production this would be improved to be render(request, "success.html") or redirect('index')
     if request.method == 'POST':
+        # Check that auction exist
         if AuctionModel.objects.filter(id=item_id).exists():
-            new_price = float(request.POST.get('new_price_input', 0.00))
-            buyer = request.user
-            auction = AuctionModel.objects.filter(id=item_id)[0]
-            # TODO: Check that new_price is valid
-            # TODO: Check that user is not seller
-            new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
-            new_bid.save()
-            return redirect('index')
+            auction = AuctionModel.objects.get(id=item_id)
+            # Check that auction is active
+            if auction.status == "Active":
+                # Check that user is not seller
+                if auction.seller.username != request.user.username:
+                    buyer = request.user
+                    # Check that new_price is valid
+                    # Round to two decimals just in case
+                    new_price = round(Decimal(request.POST.get('new_price_input', 0.00)), 2)
+                    min_increment = round(Decimal('0.01'), 2)
+                    print('new_price: ' + str(new_price))
+                    print('current_price: ' + str(auction.current_price))
+                    print('min_increment: ' + str(min_increment))
+                    print('delta: ' + str(new_price - auction.current_price))
+                    if new_price - auction.current_price >= min_increment:
+                        # Check deadline
+                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing time
+                            # Place bid
+                            new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
+                            new_bid.save()
+                            # TODO: Send emails
+                            # messages.add_message(request, messages.INFO, "You has bid successfully")
+                            msg = "You has bid successfully"
+                        else:
+                            # messages.add_message(request, messages.INFO, "You can only bid on active auctions. Deadline due.")
+                            msg = "You can only bid on active auctions. Deadline due."
+                    else:
+                        # messages.add_message(request, messages.INFO, "New bid must be greater than the current bid for at least 0.01")
+                        msg = "New bid must be greater than the current bid for at least 0.01"
+                else:
+                    # messages.add_message(request, messages.INFO, "You cannot bid on your own auctions")
+                    msg = "You cannot bid on your own auctions"
+            else:
+                # messages.add_message(request, messages.INFO, "You can only bid on active auctions")
+                msg = "You can only bid on active auctions"
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
-            return redirect('index')
+            msg = "Invalid auction id"
+        # return redirect('index')
+        return render(request, "bid-success.html", {"msg": msg})  # HttpResponse(message, content_type='text/plain')
     else:
         messages.add_message(request, messages.INFO, "GET method not avalible")
         return redirect('index')
-
-
-# @method_decorator(login_required, name='dispatch')
-# class Bid(View):
-#     def get(self, request, item_id):
-#         errors = False
-#         try:
-#             auction = AuctionModel.objects.get(id=item_id)
-#         except AuctionModel.DoesNotExist:
-#             errors = True
-#             messages.add_message(request, messages.INFO, "Invalid auction id")
-#         # Check that user is not trying to bid on own auction
-#         if not errors:
-#             if request.user.username == auction.seller.username:
-#                 # put new_price into the form before sending it to the user
-#                 form = BidForm()  # Create a blank form
-#                 return render(request, "bid.html", {"form": form, "auction": auction})
-#             else:
-#                 messages.add_message(request, messages.INFO, "You cannot bid on your own auctions")
-#                 return redirect('index')
-#         else:
-#             return redirect('index')
-#
-#     def post(self, request, item_id):
-#         # POST /auction/bid/2
-#         # { “new_price”: 15 }
-#         auction = AuctionModel.objects.get(id=item_id)
-#         print(auction)
 
 
 class ConfirmAuction(View):

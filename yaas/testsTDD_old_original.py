@@ -666,6 +666,7 @@ class UC6_BidAuctionTests(TestCase):
             "new_price": 12
         }
         # signup and signin to other user to bid
+        print('test_bid_on_outdated_auction')
         self.client.post(reverse("signup"), self.user2Info)
         self.client.post(reverse("signin"), self.user2Info)
 
