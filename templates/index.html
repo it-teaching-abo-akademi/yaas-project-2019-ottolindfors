@@ -27,7 +27,7 @@
         <p>Created: {{ auction.timestamp }}</p>
         <form action="{% url 'auction:bid' auction.id %}" method="post">
             {% csrf_token %}
-            <input type="number" min="{{ auction.current_price }}" step="0.01" name="new_price_input" value="{{ auction.current_price }}">
+            <input type="number" min="{{ auction.current_price }}" step="0.01" name="new_price" value="{{ auction.current_price }}">
             <input type="submit" value="Bid">
         </form>
         {% if request.user.is_superuser and auction.status == 'Active'%}

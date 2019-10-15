@@ -13,4 +13,5 @@ urlpatterns = [
     path('bid/<int:item_id>/', views.bid, name='bid'),  # /auction/bid/{id} : re_path(r'^bid/(\d+)/$', views.bid, name='bid')
     re_path(r'^ban/(\d+)$', views.ban, name='ban'),
     path('resolve/', views.resolve, name='resolve'),
+    path('confirm/', views.ConfirmAuction.as_view(), name='confirm')
 ]

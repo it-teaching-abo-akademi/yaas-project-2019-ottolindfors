@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm auction</title>
+</head>
+
+<body>
+
+    <h2>Confirm auction</h2>
+
+    <p><strong>Title:</strong> {{ title }}</p>
+    <p><strong>Description:</strong> {{ description }}</p>
+    <p><strong>Minimum price:</strong> {{ minimum_price }}</p>
+    <p><strong>Deadline:</strong> {{ deadline_date }}</p>
+    <p><strong>Seller:</strong> {{ seller_username }}</p>
+    <form action="{% url 'auction:confirm' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Confirm" name="confirmation_input">
+    </form>
+
+</body>
+</html>
+
+{% endblock %}

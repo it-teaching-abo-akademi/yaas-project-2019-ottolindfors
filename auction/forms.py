@@ -14,6 +14,10 @@ class CreateAuctionForm(forms.Form):
     )
 
 
+class ConfirmForm:
+    pass
+
+
 # class BidForm(forms.Form):
 #     new_price = forms.FloatField()
 

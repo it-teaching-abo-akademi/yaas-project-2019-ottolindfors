@@ -28,6 +28,20 @@ class AuctionModel(models.Model):
             current_price = self.minimum_price
         return round(current_price, 2)  # only two decimals
 
+    def get_winning_bid(self):
+        return BidModel.objects.filter(auction=self, new_price=self.current_price)
+
+    def get_winning_bidder(self):
+        return BidModel.objects.filter(auction=self, new_price=self.current_price).buyer
+
+    def get_second_place_bidder(self):
+        # TODO: Fix error when index out of range (may some sort of .get() instead of [1])
+        try:
+            bidder = BidModel.objects.filter(auction=self).order_by('-new_price')[1].buyer
+        except IndexError:
+            bidder = None
+        return bidder
+
     # def increment_revision
 
     # Override default function __str__(self) to print a string presentation of the object instead of memory address
@@ -48,7 +62,6 @@ class BidModel(models.Model):
         query_set_max_price = BidModel.objects.filter(auction=self.auction).aggregate(Max('new_price'))
         min_bid = query_set_max_price.get('new_price') + 1
         pass
-
 
     #
     # def save(self):

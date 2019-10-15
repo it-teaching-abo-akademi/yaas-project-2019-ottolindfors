@@ -706,6 +706,7 @@ class UC6_BidAuctionTests(TestCase):
             "new_price": 12
         }
 
+        print('** test_bid_with_valid_data **')
         # signup and signin to other user to bid
         self.client.post(reverse("signup"), self.user2Info)
         self.client.post(reverse("signin"), self.user2Info)

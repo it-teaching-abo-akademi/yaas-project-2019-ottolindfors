@@ -1,0 +1,32 @@
+# Project report - YAAS 2019
+
+Author: Otto Lindfors 37944
+## Implemented requirements
+## Passed tests
+* UC1
+  * All tests are passed.
+  * Full functionality implemented.
+* UC2
+  * All tests are passed
+* UC3
+  * All tests are passed
+  * Full functionality implemented.
+  * See conflicts between test and requirement below.
+* UC4
+  * All tests are passed
+  * Full functionality implemented.
+* UC5
+  * All tests are passed
+  * Full functionality implemented.
+
+## Conflicts between requirements and tests
+* REQ3.3, REQ3.3.1, REQ3.3.2
+  * ​Requirement: The user must be asked for a confirmation before creating a new auction.
+  * Conflict: The testTDD only works without the confirmation. Therefore the confirmation is disabled.
+  To enable confirmation toggle the variable auction > views > CreateAuction > post() > ask_for_confirmation = True
+
+## Brower used for testing
+* Firefox 69.0.2 on macOS and Ubuntu 18.04 LTS
+
+## List of Python packages
+* See requirements.txt

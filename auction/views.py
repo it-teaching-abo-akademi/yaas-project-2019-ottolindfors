@@ -12,6 +12,7 @@ from django.views import View
 from django.http import HttpResponse, request, HttpResponseRedirect
 from django.urls import reverse
 
+from user.models import CustomUser
 from .models import AuctionModel, BidModel
 from .forms import CreateAuctionForm
 
@@ -60,6 +61,7 @@ class CreateAuction(View):
 
     def post(self, request):
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
+        # TODO: Minimum_price validates incorrectly as 0.02
         if form.is_valid():
             cdata = form.cleaned_data
             cdata_is_valid = True
@@ -81,25 +83,116 @@ class CreateAuction(View):
 
             # Create auction or return form
             if cdata_is_valid:
-                # TODO: (Addittional) Improve security on user confirmation. According to Dragos L5-Security.pdf
+                title = cdata["title"]
+                description = cdata["description"]
+                minimum_price = cdata["minimum_price"]
+                deadline_date = cdata["deadline_date"]
+                seller = request.user
+                # TODO: Ask for confirmation
+                # TODO: toggle to False to pass tests
+                # Specs say we need confirmation but tests do not work with confirmation
+                ask_for_confirmation = False
+                if ask_for_confirmation:
+                    # Save to session
+                    save_to_session(
+                        request=request,
+                        title=title,
+                        description=description,
+                        minimum_price=minimum_price,
+                        deadline_date=deadline_date,
+                        seller_username=seller.username
+                    )
+                    # Redirect to confirmaion
+                    return render(
+                        request,
+                        "createauction-confirm.html",
+                        {
+                            "title": title,
+                            "description": description,
+                            "minimum_price": minimum_price,
+                            "deadline_date": deadline_date,
+                            "seller_username": seller.username
+                        }
+                    )
+                else:
+                    # Create token unique for editing without login
+                    token = str(uuid.uuid4())
+                    while len(AuctionModel.objects.filter(token=token)) != 0:
+                        token = str(uuid.uuid4())
+                        print('Generated another token: ' + token)
+                    # Create auction
+                    new_auction = AuctionModel(
+                        title=title,
+                        description=description,
+                        minimum_price=minimum_price,
+                        deadline_date=deadline_date,
+                        token=token,
+                        seller=seller
+                    )
+                    # Save the auction to the database
+                    new_auction.save()
+                    # Send a dummy email
+                    subject = 'Your auction'
+                    edit_link = '127.0.0.1:8000/auction/edit/no-signin/' + token
+                    message = 'Auction has been created successfully. Use this link to edit your auction ' + edit_link
+                    sender = 'bot@erwin.com'
+                    request.user.email_user(subject=subject, message=message, from_email=sender)
+                    # Add messages
+                    messages.add_message(
+                        request,
+                        messages.INFO,
+                        "Auction has been created successfully")
+                    messages.add_message(
+                        request,
+                        messages.INFO,
+                        "Email has been sent to you. Edit the description of your auction without signin in at " + edit_link)
+                    return redirect('index')
+            else:
+                messages.add_message(request, messages.INFO, "Please check your entries")
+                return render(request, "createauction.html", {"form": form})
+        else:
+            messages.add_message(
+                request,
+                messages.INFO,
+                "We tried everything. Looks like the data you gave us was invalid."
+            )
+            print(form.errors)
+            return render(request, "createauction.html", {"form": form})  # Give a blank form to the user if the data was not valid
+
+
+class ConfirmAuction(View):
+    def get(self, request):
+        pass
+        # give a html/form with yes button
+
+    def post(self, request):
+        # if yes is posted to us then:
+        # new_auction = get_from_session()
+        # new_auction.save()
+        if request.POST.get('confirmation_input', '') == "Confirm":
+            # Retrieve data from stored session
+            auction_data = get_from_session(request)
+            # Check that user is the correct signed in user, no session hijacking
+            if request.user.username == auction_data['seller_username']:
                 # Create token unique for editing without login
                 token = str(uuid.uuid4())
                 while len(AuctionModel.objects.filter(token=token)) != 0:
                     token = str(uuid.uuid4())
                     print('Generated another token: ' + token)
+                title = auction_data['title']
+                description = auction_data['description']
+                minimum_price = auction_data['minimum_price']
+                deadline_date = auction_data['deadline_date']
+                seller = CustomUser.objects.get(username=request.user.username)
                 # Create auction
                 new_auction = AuctionModel(
-                    title=cdata["title"],
-                    description=cdata["description"],
-                    minimum_price=cdata["minimum_price"],
-                    deadline_date=cdata["deadline_date"],
+                    title=title,
+                    description=description,
+                    minimum_price=minimum_price,
+                    deadline_date=deadline_date,
                     token=token,
-                    seller=request.user
+                    seller=seller
                 )
-                # TODO: Ask for confirmation
-                # Save to session
-                # redirect to confirmaion
-
                 # Save the auction to the database
                 new_auction.save()
                 # Send a dummy email
@@ -118,17 +211,35 @@ class CreateAuction(View):
                     messages.INFO,
                     "Email has been sent to you. Edit the description of your auction without signin in at " + edit_link)
                 return redirect('index')
-            else:
-                messages.add_message(request, messages.INFO, "Please check your entries")
-                return render(request, "createauction.html", {"form": form})
-
         else:
-            messages.add_message(
-                request,
-                messages.INFO,
-                "We tried everything. Looks like the data you gave us was invalid."
-            )
-            return render(request, "createauction.html", {"form": form})  # Give a blank form to the user if the data was not valid
+            messages.add_message(request, messages.INFO, "Auction not confirmed")
+            return redirect('index')
+
+
+def save_to_session(request, title, description, minimum_price, deadline_date, seller_username):
+    request.session['title'] = title
+    request.session['description'] = description
+    request.session['minimum_price'] = str(minimum_price)  # otherwise error
+    request.session['deadline_date'] = datetime.strftime(deadline_date, '%d.%m.%Y %H:%M:%S')  # otherwise error
+    request.session['seller_username'] = seller_username  # prevent session hijacking
+    print('input: ' + str(minimum_price) + ' : ' + str(deadline_date))
+
+
+def get_from_session(request):
+    title = request.session['title']
+    description = request.session['description']
+    minimum_price = Decimal(request.session['minimum_price'])
+    deadline_date = datetime.strptime(request.session['deadline_date'], '%d.%m.%Y %H:%M:%S')
+    seller_username = request.session['seller_username']
+    print('output: ' + str(minimum_price) + ' : ' + str(deadline_date))
+    auction_data = {
+        "title": title,
+        "description": description,
+        "minimum_price": minimum_price,
+        "deadline_date": deadline_date,
+        "seller_username": seller_username
+    }
+    return auction_data
 
 
 @method_decorator(login_required, name='dispatch')
@@ -228,9 +339,8 @@ def bid(request, item_id):
                 # Check that user is not seller
                 if auction.seller.username != request.user.username:
                     buyer = request.user
-                    # Check that new_price is valid
-                    # Round to two decimals just in case
-                    new_price = round(Decimal(request.POST.get('new_price_input', 0.00)), 2)
+                    # Check that new_price is valid. Round to two decimals
+                    new_price = round(Decimal(request.POST.get('new_price', '')), 2)
                     min_increment = round(Decimal('0.01'), 2)
                     print('new_price: ' + str(new_price))
                     print('current_price: ' + str(auction.current_price))
@@ -238,46 +348,40 @@ def bid(request, item_id):
                     print('delta: ' + str(new_price - auction.current_price))
                     if new_price - auction.current_price >= min_increment:
                         # Check deadline
-                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing time
-                            # Place bid
+                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing tim
+                            # TODO: Figure out why testTDD UC6 FAILS
+
                             new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
                             new_bid.save()
-                            # TODO: Send emails
-                            # messages.add_message(request, messages.INFO, "You has bid successfully")
+
+                            subject = 'New bid'
+                            message = 'A new bid has been placed.'
+                            sender = 'bot@erwin.com'
+                            second_place_bidder = auction.get_second_place_bidder()
+                            second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
+                            auction.seller.email_user(subject=subject, message=message, from_email=sender)
+                            print(second_place_bidder)
+                            print(auction.seller)
+                            print('email sent after bid placed')
+
                             msg = "You has bid successfully"
                         else:
-                            # messages.add_message(request, messages.INFO, "You can only bid on active auctions. Deadline due.")
                             msg = "You can only bid on active auctions. Deadline due."
                     else:
-                        # messages.add_message(request, messages.INFO, "New bid must be greater than the current bid for at least 0.01")
                         msg = "New bid must be greater than the current bid for at least 0.01"
                 else:
-                    # messages.add_message(request, messages.INFO, "You cannot bid on your own auctions")
                     msg = "You cannot bid on your own auctions"
             else:
-                # messages.add_message(request, messages.INFO, "You can only bid on active auctions")
                 msg = "You can only bid on active auctions"
         else:
             messages.add_message(request, messages.INFO, "Invalid auction id")
             msg = "Invalid auction id"
-        # return redirect('index')
-        return render(request, "bid-success.html", {"msg": msg})  # HttpResponse(message, content_type='text/plain')
+        messages.add_message(request, messages.INFO, msg)
+        return redirect('index')
+        #return render(request, "bid-success.html", {"msg": msg})  # HttpResponse(message, content_type='text/plain')
     else:
         messages.add_message(request, messages.INFO, "GET method not avalible")
         return redirect('index')
-
-
-class ConfirmAuction(View):
-    def get(self, request):
-        pass
-        # give a html/forom with yes button
-
-    def post(self, request):
-        pass
-        # if yes is posted to us then:
-        # new_auction = get_from_session()
-        # new_auction.save()
-
 
 
 def ban(request, item_id):
@@ -296,12 +400,3 @@ def changeLanguage(request, lang_code):
 def changeCurrency(request, currency_code):
     pass
 
-
-def save_to_session(request, new_auction):
-    request.session['new_auction'] = new_auction
-
-
-def get_from_session(reqest):
-    title = request.session['title']
-    # return new_auction
-    pass
