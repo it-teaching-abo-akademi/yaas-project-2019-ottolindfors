@@ -19,38 +19,16 @@ from .forms import CreateAuctionForm
 
 def index(request):
     auctions = AuctionModel.objects.filter(status='Active').order_by('deadline_date')  # nearest deadline first
-    print(auctions)  # debugging
     return render(request, "index.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
 
 
 def search(request):
-    # TODO: return search results as json? See commented below
     if request.GET.get("term", "") != "":  # search by title
-        print("IF\n" + str(request.GET))
         criteria = request.GET["term"].lower().strip()
         search_result = AuctionModel.objects.filter(title__contains=criteria, status="Active").order_by('deadline_date')
     else:
-        print("ELSE\n" + str(request.GET))
         search_result = AuctionModel.objects.filter(status="Active").order_by('-timestamp')
     return render(request, "index.html", {"auctions": search_result})
-
-
-"""
-# Returning JSON search result does not pass test
-@api_view(["GET"])  # Only apply to GET requests
-@renderer_classes([JSONRenderer])   # Only return JSON format, not XML or other
-def search(request):
-    if request.GET.get("term") != "":
-        print("IF\n" + str(request.GET))  # debugging
-        criteria = request.GET["term"].lower().strip()
-        # Search result
-        auctions = AuctionModel.objects.filter(title__contains=criteria, status="Active").order_by('deadline_date')
-        # Serialize data
-        auctions_serialized = AuctionSerializer(auctions, many=True)
-        return Response(auctions_serialized.data)
-    else:
-        pass
-"""
 
 
 @method_decorator(login_required, name='dispatch')
@@ -62,13 +40,11 @@ class CreateAuction(View):
     def post(self, request):
         print(request.POST)
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
-        # TODO: Minimum_price validates incorrectly as 0.02
         if form.is_valid():
             cdata = form.cleaned_data
             cdata_is_valid = True
 
             # Validate minimum price
-            print(type(cdata.get("minimum_price", "")))
             if cdata["minimum_price"] < Decimal('0.01'):  # < 0.01 evaluates incorrectly as float 0.01 is larger than decimal 0.01
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "Ensure this value is greater than or equal to 0.01")
@@ -90,7 +66,6 @@ class CreateAuction(View):
                 minimum_price = cdata["minimum_price"]
                 deadline_date = cdata["deadline_date"]
                 seller = request.user
-                # TODO: Ask for confirmation
                 # TODO: toggle to False to pass tests
                 # Specs say we need confirmation but tests do not work with confirmation
                 ask_for_confirmation = False
@@ -162,6 +137,7 @@ class CreateAuction(View):
             return render(request, "createauction.html", {"form": form})  # Give a blank form to the user if the data was not valid
 
 
+@method_decorator(login_required, name='dispatch')
 class ConfirmAuction(View):
     def get(self, request):
         pass
@@ -218,6 +194,7 @@ class ConfirmAuction(View):
             return redirect('index')
 
 
+@login_required
 def save_to_session(request, title, description, minimum_price, deadline_date, seller_username):
     request.session['title'] = title
     request.session['description'] = description
@@ -227,6 +204,7 @@ def save_to_session(request, title, description, minimum_price, deadline_date, s
     print('input: ' + str(minimum_price) + ' : ' + str(deadline_date))
 
 
+@login_required
 def get_from_session(request):
     title = request.session['title']
     description = request.session['description']
@@ -330,8 +308,6 @@ class EditAuctionNoSignIn(View):
 
 @login_required
 def bid(request, item_id):
-    # TODO: testTDD require response to be status code 200 --> HttpResponse(error_message, content_type='text/plain')
-    #  In production this would be improved to be render(request, "success.html") or redirect('index')
     if request.method == 'POST':
         # Check that auction exist
         if AuctionModel.objects.filter(id=item_id).exists():
@@ -384,11 +360,13 @@ def bid(request, item_id):
         return redirect('index')
 
 
+@login_required
 def ban(request, item_id):
     # TODO: Just set auction.status=Banned
     pass
 
 
+@login_required
 def resolve(request):
     pass
 

@@ -13,7 +13,11 @@
 
     <h2>Auctions</h2>
 
-    <p>{{ time }}</p>
+    <form action="{% url 'auction:search' %}" method="get">
+        {% csrf_token %}
+        <input type="search" name="term">
+        <input type="submit" value="Search">
+    </form>
 
     {% for auction in auctions %}
         <h2>{{ auction.title }}</h2>
