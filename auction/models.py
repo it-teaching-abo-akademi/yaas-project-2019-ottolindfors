@@ -37,9 +37,11 @@ class AuctionModel(models.Model):
     def get_second_place_bidder(self):
         # TODO: Fix error when index out of range (may some sort of .get() instead of [1])
         try:
-            bidder = BidModel.objects.filter(auction=self).order_by('-new_price')[1].buyer
+            # bidder = BidModel.objects.filter(auction=self).order_by('-new_price')[1].buyer
+            bidder = BidModel.objects.get(auction=self, new_price=self.current_price).buyer
         except IndexError:
             bidder = None
+            # TODO: Handle this None return in auction:bid function
         return bidder
 
     # def increment_revision

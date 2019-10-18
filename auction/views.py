@@ -60,6 +60,7 @@ class CreateAuction(View):
         return render(request, "createauction.html", {"form": form})
 
     def post(self, request):
+        print(request.POST)
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         # TODO: Minimum_price validates incorrectly as 0.02
         if form.is_valid():
@@ -67,7 +68,8 @@ class CreateAuction(View):
             cdata_is_valid = True
 
             # Validate minimum price
-            if cdata["minimum_price"] < 0.01:
+            print(type(cdata.get("minimum_price", "")))
+            if cdata["minimum_price"] < Decimal('0.01'):  # < 0.01 evaluates incorrectly as float 0.01 is larger than decimal 0.01
                 cdata_is_valid = False
                 messages.add_message(request, messages.INFO, "Ensure this value is greater than or equal to 0.01")
             # Validate format of deadline_date (is also done in form)
@@ -348,21 +350,19 @@ def bid(request, item_id):
                     print('delta: ' + str(new_price - auction.current_price))
                     if new_price - auction.current_price >= min_increment:
                         # Check deadline
-                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing tim
+                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing time
                             # TODO: Figure out why testTDD UC6 FAILS
-
+                            # Save the new_bid
                             new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
                             new_bid.save()
 
+                            # Send email
                             subject = 'New bid'
                             message = 'A new bid has been placed.'
                             sender = 'bot@erwin.com'
                             second_place_bidder = auction.get_second_place_bidder()
                             second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
                             auction.seller.email_user(subject=subject, message=message, from_email=sender)
-                            print(second_place_bidder)
-                            print(auction.seller)
-                            print('email sent after bid placed')
 
                             msg = "You has bid successfully"
                         else:
