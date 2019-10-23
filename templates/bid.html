@@ -13,11 +13,29 @@
 
     <h2>Bid on auction</h2>
 
-    <form action="{% url "auction:bid" %}" method="post">
+    <p>Title: {{ auction.title }}</p>
+    <p>Id: {{ auction.id }}</p>
+    <p>Description: {{ auction.description }}</p>
+    <p>Current price: {{ auction.current_price }}</p>
+    <p>Starting price: {{ auction.minimum_price }}</p>
+    <p>Status: {{ auction.status }}</p>
+    <p>Seller: {{ auction.seller }}</p>
+    <p>Deadline: {{ auction.deadline_date }}</p>
+    <p>Created: {{ auction.timestamp }}</p>
+
+    <form action="{% url "auction:bid" item_id%}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Submit">
+        <input type="submit" value="Bid">
     </form>
+
+    {% comment %}
+    <form action="{% url 'auction:bid' auction.id %}" method="post">
+        {% csrf_token %}
+        <input type="number" min="{{ auction.current_price }}" step="0.01" name="new_price" value="{{ auction.current_price }}">
+        <input type="submit" value="Bid">
+    </form>
+    {% endcomment %}
 
 </body>
 </html>

@@ -14,7 +14,7 @@ from django.urls import reverse
 
 from user.models import CustomUser
 from .models import AuctionModel, BidModel
-from .forms import CreateAuctionForm
+from .forms import CreateAuctionForm, BidForm
 
 
 def index(request):
@@ -38,7 +38,6 @@ class CreateAuction(View):
         return render(request, "createauction.html", {"form": form})
 
     def post(self, request):
-        print(request.POST)
         form = CreateAuctionForm(request.POST)   # Create a form with the data the user has POSTed to us
         if form.is_valid():
             cdata = form.cleaned_data
@@ -133,7 +132,6 @@ class CreateAuction(View):
                 messages.INFO,
                 "We tried everything. Looks like the data you gave us was invalid."
             )
-            print(form.errors)
             return render(request, "createauction.html", {"form": form})  # Give a blank form to the user if the data was not valid
 
 
@@ -306,15 +304,51 @@ class EditAuctionNoSignIn(View):
             return redirect(reverse("index"))
 
 
-@login_required
-def bid(request, item_id):
-    if request.method == 'POST':
-        # Check that auction exist
+@method_decorator(login_required, name='dispatch')
+class Bid(View):
+    def get(self, request, item_id):
+        # Auction exists
         if AuctionModel.objects.filter(id=item_id).exists():
             auction = AuctionModel.objects.get(id=item_id)
             # Check that auction is active
             if auction.status == "Active":
-                # Check that user is not seller
+                # Check that user (bidder) is not the seller
+                if auction.seller.username != request.user.username:
+                    # Check deadline
+                    if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):
+                        inidata = {"new_price": auction.current_price}
+                        form = BidForm(initial=inidata)
+                        return render(request, "bid.html", {"auction": auction, "form": form, "item_id": item_id})
+                    else:
+                        msg = "You can only bid on active auctions. Deadline due."
+                else:
+                    msg = "You cannot bid on your own auctions"
+            else:
+                msg = "You can only bid on active auctions"
+
+            messages.add_message(request, messages.INFO, msg)
+            return redirect('index')
+        else:
+            msg = "Invalid auction id"
+            messages.add_message(request, messages.INFO, msg)
+            return redirect('index')
+
+    def post(self, request, item_id):
+        form = BidForm(request.POST)
+        # if form.is_valid():
+        #     pass
+        # else:
+        #     messages.add_message(request, messages.INFO, "Form is not valid")
+        #     return render(request, "bid.html", {"form": form})
+
+        # TODO Use a form for bidding
+        # Check that auction exist
+        if AuctionModel.objects.filter(id=item_id).exists():
+            auction = AuctionModel.objects.get(id=item_id)
+            success = False
+            # Check that auction is active
+            if auction.status == "Active":
+                # Check that user (bidder) is not the seller
                 if auction.seller.username != request.user.username:
                     buyer = request.user
                     # Check that new_price is valid. Round to two decimals
@@ -326,8 +360,9 @@ def bid(request, item_id):
                     print('delta: ' + str(new_price - auction.current_price))
                     if new_price - auction.current_price >= min_increment:
                         # Check deadline
-                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give som processing time
-                            # TODO: Figure out why testTDD UC6 FAILS
+                        if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give 1 second processing time
+                            # TODO: Check that the user is bidding on the latest description (use version numbers)
+
                             # Save the new_bid
                             new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
                             new_bid.save()
@@ -341,6 +376,7 @@ def bid(request, item_id):
                             auction.seller.email_user(subject=subject, message=message, from_email=sender)
 
                             msg = "You has bid successfully"
+                            success = True
                         else:
                             msg = "You can only bid on active auctions. Deadline due."
                     else:
@@ -349,21 +385,49 @@ def bid(request, item_id):
                     msg = "You cannot bid on your own auctions"
             else:
                 msg = "You can only bid on active auctions"
+
+            if success:
+                messages.add_message(request, messages.INFO, msg)
+                return redirect('index')
+            else:
+                messages.add_message(request, messages.INFO, msg)
+                return render(request, "bid.html", {"auction": auction, "form": form, "item_id": item_id})
         else:
-            messages.add_message(request, messages.INFO, "Invalid auction id")
             msg = "Invalid auction id"
-        messages.add_message(request, messages.INFO, msg)
-        return redirect('index')
-        #return render(request, "bid-success.html", {"msg": msg})  # HttpResponse(message, content_type='text/plain')
-    else:
-        messages.add_message(request, messages.INFO, "GET method not avalible")
-        return redirect('index')
+            messages.add_message(request, messages.INFO, msg)
+            return redirect('index')
+
+
+        # TODO: Figure out how to return correctly 200 and not 302
+        # return redirect('index')
+        # return render(request, "bid.html")
 
 
 @login_required
 def ban(request, item_id):
-    # TODO: Just set auction.status=Banned
-    pass
+    if request.method == 'POST':
+        # TODO: Send emails to seller and all bidders after ban
+        # Check permission
+        if request.user.is_superuser:
+            # Auction exists
+            if AuctionModel.objects.filter(id=item_id).exists():
+                auction = AuctionModel.objects.get(id=item_id)
+                # Auction is active in order to ban
+                if auction.status == 'Active':
+                    AuctionModel.objects.filter(id=item_id).update(status="Banned")
+                    msg = "Ban successfully. Auction " + str(AuctionModel.objects.get(id=item_id).id) + " is now " + AuctionModel.objects.get(id=item_id).status
+                else:
+                    msg = "Auction status is " + auction.status
+            else:
+                msg = "Invalid auction id"
+        else:
+            msg = "Only admins has the right to ban an auction"
+        # Return to index with messages
+        messages.add_message(request, messages.INFO, msg)
+        return redirect('index')
+    else:
+        messages.add_message(request, messages.INFO, "GET method not avalible")
+        return redirect('index')
 
 
 @login_required

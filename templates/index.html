@@ -20,6 +20,7 @@
     </form>
 
     {% for auction in auctions %}
+
         <h2>{{ auction.title }}</h2>
         <p>{{ auction.id }}</p>
         <p>{{ auction.description }}</p>
@@ -29,19 +30,28 @@
         <p>Seller: {{ auction.seller }}</p>
         <p>Deadline: {{ auction.deadline_date }}</p>
         <p>Created: {{ auction.timestamp }}</p>
+
+        {% comment %}
         <form action="{% url 'auction:bid' auction.id %}" method="post">
             {% csrf_token %}
             <input type="number" min="{{ auction.current_price }}" step="0.01" name="new_price" value="{{ auction.current_price }}">
             <input type="submit" value="Bid">
         </form>
+        {% endcomment %}
+
+        <a href="{% url 'auction:bid' auction.id %}">Bid</a>
+
         {% if request.user.is_superuser and auction.status == 'Active'%}
-            {% csrf_token %}
             <form action="{% url 'auction:ban' auction.id %}" method="post">
-            <input type="submit" value="Ban">
-        </form>
+                {% csrf_token %}
+                <input type="submit" value="Ban">
+            </form>
         {% endif %}
+
     {% empty %}
+
         <p>No auctions posted.</p>
+
     {% endfor %}
 
 </body>

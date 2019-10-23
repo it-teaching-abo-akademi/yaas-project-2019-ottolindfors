@@ -20,14 +20,5 @@ class ConfirmForm:
     pass
 
 
-# class BidForm(forms.Form):
-#     new_price = forms.FloatField()
-
-# class BidForm(forms.ModelForm):
-#     class Meta:
-#         model = BidModel
-#         fields = ('new_price',)
-#
-#     def save(self, commit=True):
-#         bid = super(BidForm, self).save(commit=False)
-#
+class BidForm(forms.Form):
+    new_price = forms.DecimalField(decimal_places=2, max_digits=15)
