@@ -398,11 +398,6 @@ class Bid(View):
             return redirect('index')
 
 
-        # TODO: Figure out how to return correctly 200 and not 302
-        # return redirect('index')
-        # return render(request, "bid.html")
-
-
 @login_required
 def ban(request, item_id):
     if request.method == 'POST':
