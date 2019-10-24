@@ -269,10 +269,8 @@ class EditAuction(View):
 
 class EditAuctionNoSignIn(View):
     def get(self, request, token):
-        # TODO: Use AuctionModel.objects.filter().exists()
-        auctions = AuctionModel.objects.filter(token=token)
-        if len(auctions) == 1:
-            auction = auctions[0]
+        if AuctionModel.objects.filter(token=token).exists():
+            auction = AuctionModel.objects.get(token=token)
             return render(
                 request,
                 "editauction-no-signin.html",
@@ -287,12 +285,10 @@ class EditAuctionNoSignIn(View):
             return redirect(reverse("index"))
 
     def post(self, request, token):
-        auctions = AuctionModel.objects.filter(token=token)
-        if len(auctions) == 1:
-            auction = auctions[0]
-            auction.description = request.POST.get("description", auction.description).strip()  # no change if failure
-            # TODO: Use update() instead of save()
-            auction.save()
+        if AuctionModel.objects.filter(token=token).exists():
+            description = request.POST.get("description", AuctionModel.objects.get(token=token).description).strip() # No change if failure
+            AuctionModel.objects.filter(token=token).update(description=description, version=F('version')+1)
+
             messages.add_message(request, messages.INFO, "Auction updated successfully")
             return redirect("index")
         else:
