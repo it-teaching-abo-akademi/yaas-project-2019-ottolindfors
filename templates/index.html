@@ -22,8 +22,9 @@
     {% for auction in auctions %}
 
         <h2>{{ auction.title }}</h2>
-        <p>{{ auction.id }}</p>
-        <p>{{ auction.description }}</p>
+        <p>Description: {{ auction.description }}</p>
+        <p>Id: {{ auction.id }}</p>
+        <p>Version: {{ auction.version }}</p>
         <p>Starting price: {{ auction.minimum_price }}</p>
         <p>Current price: {{ auction.current_price }}</p>
         <p>{{ auction.status }}</p>
@@ -40,6 +41,8 @@
         {% endcomment %}
 
         <a href="{% url 'auction:bid' auction.id %}">Bid</a>
+
+        <a href="{% url 'auction:edit' auction.id %}">Edit</a>
 
         {% if request.user.is_superuser and auction.status == 'Active'%}
             <form action="{% url 'auction:ban' auction.id %}" method="post">

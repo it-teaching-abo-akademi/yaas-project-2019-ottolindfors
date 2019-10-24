@@ -18,7 +18,7 @@ class AuctionModel(models.Model):
     token = models.CharField(max_length=255, unique=True, null=True)
     # Many auctions can refer to the same seller (one seller can have many auctions)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
-    # revision = models.IntegerField(default=1)
+    version = models.IntegerField(default=1)
 
     @property
     def current_price(self):
@@ -44,7 +44,12 @@ class AuctionModel(models.Model):
             # TODO: Handle this None return in auction:bid function
         return bidder
 
-    # def increment_revision
+    def increment_version(self):
+        self.version += 1
+
+    @property
+    def next_version_number(self):
+        return self.version + 1
 
     # Override default function __str__(self) to print a string presentation of the object instead of memory address
     def __str__(self):
