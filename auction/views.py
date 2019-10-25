@@ -366,14 +366,14 @@ class Bid(View):
                         # Do not allow to bid after viewing earlier version
                         if (auction.id == auction_id and auction.version == auction_version) or auction_id == '':
 
-                            # Check that new_price is valid. Round to two decimals
-                            new_price = round(Decimal(request.POST.get('new_price', '')), 2)
-                            min_increment = round(Decimal('0.01'), 2)
-                            if new_price - auction.current_price >= min_increment:
-                                # TODO: Check the price as the last thing as this is the most important thing
+                            # Check deadline
+                            if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=3):  # give 3 seconds processing time
 
-                                # Check deadline
-                                if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give 1 second processing time
+                                # Check that new_price is valid. Round to two decimals
+                                new_price = round(Decimal(request.POST.get('new_price', '')), 2)
+                                min_increment = round(Decimal('0.01'), 2)
+                                if new_price - auction.current_price >= min_increment:
+
                                     # Save the new_bid
                                     new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
                                     new_bid.save()
@@ -389,9 +389,9 @@ class Bid(View):
                                     msg = "You has bid successfully"
                                     success = True
                                 else:
-                                    msg = "You can only bid on active auctions. Deadline due."
+                                    msg = "New bid must be greater than the current bid for at least 0.01. The auction information has been changed"
                             else:
-                                msg = "New bid must be greater than the current bid for at least 0.01. The auction information has been changed"
+                                msg = "You can only bid on active auctions. Deadline due."
                         else:
                             msg = "Bid rejected. The auction information has been changed."
                     else:
