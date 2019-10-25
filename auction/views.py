@@ -69,7 +69,7 @@ class CreateAuction(View):
                 ask_for_confirmation = False
                 if ask_for_confirmation:
                     # Save to session
-                    save_to_session(
+                    save_auction_to_session(
                         request=request,
                         title=title,
                         description=description,
@@ -145,7 +145,7 @@ class ConfirmAuction(View):
         # if yes is posted to us then:
         if request.POST.get('confirmation_input', '') == "Confirm":
             # Retrieve data from stored session
-            auction_data = get_from_session(request)
+            auction_data = get_auction_from_session(request)
             # Check that user is the correct signed in user, no session hijacking
             if request.user.username == auction_data['seller_username']:
                 title = auction_data['title']
@@ -192,31 +192,42 @@ class ConfirmAuction(View):
 
 
 @login_required
-def save_to_session(request, title, description, minimum_price, deadline_date, seller_username):
+def save_auction_to_session(request, title, description, minimum_price, deadline_date, seller_username):
     request.session['title'] = title
     request.session['description'] = description
     request.session['minimum_price'] = str(minimum_price)  # otherwise error
     request.session['deadline_date'] = datetime.strftime(deadline_date, '%d.%m.%Y %H:%M:%S')  # otherwise error
     request.session['seller_username'] = seller_username  # prevent session hijacking
-    print('input: ' + str(minimum_price) + ' : ' + str(deadline_date))
 
 
 @login_required
-def get_from_session(request):
-    title = request.session['title']
-    description = request.session['description']
-    minimum_price = Decimal(request.session['minimum_price'])
-    deadline_date = datetime.strptime(request.session['deadline_date'], '%d.%m.%Y %H:%M:%S')
-    seller_username = request.session['seller_username']
-    print('output: ' + str(minimum_price) + ' : ' + str(deadline_date))
+def get_auction_from_session(request):
     auction_data = {
-        "title": title,
-        "description": description,
-        "minimum_price": minimum_price,
-        "deadline_date": deadline_date,
-        "seller_username": seller_username
+        "title": request.session['title'],
+        "description": request.session['description'],
+        "minimum_price": Decimal(request.session['minimum_price']),
+        "deadline_date": datetime.strptime(request.session['deadline_date'], '%d.%m.%Y %H:%M:%S'),
+        "seller_username": request.session['seller_username']
     }
+    # TODO: del request.session['title'], etc.
     return auction_data
+
+
+@login_required
+def save_auction_version_to_session(request, auction_id, auction_version):
+    request.session['auction_id'] = auction_id
+    request.session['auction_version'] = auction_version
+
+
+@login_required
+def get_auction_version_from_session(request):
+    bid_data = {
+        "auction_id": request.session['auction_id'],
+        "auction_version": request.session['auction_version']
+    }
+    del request.session['auction_id']
+    del request.session['auction_version']
+    return bid_data
 
 
 @method_decorator(login_required, name='dispatch')
@@ -309,6 +320,8 @@ class Bid(View):
                 if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):
                     inidata = {"new_price": auction.current_price}
                     form = BidForm(initial=inidata)
+                    # Save to session what version of the auction that is accessed (for concurrency)
+                    save_auction_version_to_session(request, item_id, auction.version)
                     return render(request, "bid.html", {"auction": auction, "form": form, "item_id": item_id})
                 else:
                     msg = "You can only bid on active auctions. Deadline due."
@@ -337,34 +350,50 @@ class Bid(View):
                     if auction.seller.username != request.user.username:
                         buyer = request.user
 
-                        # Check that new_price is valid. Round to two decimals
-                        new_price = round(Decimal(request.POST.get('new_price', '')), 2)
-                        min_increment = round(Decimal('0.01'), 2)
-                        if new_price - auction.current_price >= min_increment:
+                        # TODO: Make this better in production. Now if a user tries to manually POST after previously
+                        #  viewing some older version the POST will not work because the auction_version is old...
+                        # Check that the user is bidding on the latest description (using version numbers)
+                        try:
+                            # Bidding on an auction after viewing some (any) auctions bid page (accessing GET method)
+                            last_viewed_auction_version = get_auction_version_from_session(request)
+                            auction_id = last_viewed_auction_version.get('auction_id', '')
+                            auction_version = last_viewed_auction_version.get('auction_version', '')
+                        except KeyError:
+                            # Bidding on auction without first viewing it
+                            auction_id = ''
+                            auction_version = ''
 
-                            # Check deadline
-                            if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give 1 second processing time
-                                # TODO: Check that the user is bidding on the latest description (use version numbers)
-                                #  For concurrency
+                        # Do not allow to bid after viewing earlier version
+                        if (auction.id == auction_id and auction.version == auction_version) or auction_id == '':
 
-                                # Save the new_bid
-                                new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
-                                new_bid.save()
+                            # Check that new_price is valid. Round to two decimals
+                            new_price = round(Decimal(request.POST.get('new_price', '')), 2)
+                            min_increment = round(Decimal('0.01'), 2)
+                            if new_price - auction.current_price >= min_increment:
+                                # TODO: Check the price as the last thing as this is the most important thing
 
-                                # Send email
-                                subject = 'New bid'
-                                message = 'A new bid has been placed.'
-                                sender = 'bot@erwin.com'
-                                second_place_bidder = auction.get_second_place_bidder()
-                                second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
-                                auction.seller.email_user(subject=subject, message=message, from_email=sender)
+                                # Check deadline
+                                if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):  # give 1 second processing time
+                                    # Save the new_bid
+                                    new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
+                                    new_bid.save()
 
-                                msg = "You has bid successfully"
-                                success = True
+                                    # Send email
+                                    subject = 'New bid'
+                                    message = 'A new bid has been placed.'
+                                    sender = 'bot@erwin.com'
+                                    second_place_bidder = auction.get_second_place_bidder()
+                                    second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
+                                    auction.seller.email_user(subject=subject, message=message, from_email=sender)
+
+                                    msg = "You has bid successfully"
+                                    success = True
+                                else:
+                                    msg = "You can only bid on active auctions. Deadline due."
                             else:
-                                msg = "You can only bid on active auctions. Deadline due."
+                                msg = "New bid must be greater than the current bid for at least 0.01. The auction information has been changed"
                         else:
-                            msg = "New bid must be greater than the current bid for at least 0.01"
+                            msg = "Bid rejected. The auction information has been changed."
                     else:
                         msg = "You cannot bid on your own auctions"
                 else:
