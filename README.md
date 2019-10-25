@@ -4,24 +4,24 @@ Author: Otto Lindfors 37944
 ## Implemented requirements
 ## Passed tests
 * UC1
-  * All tests are passed.
   * Full functionality and all requirements implemented.
+  * All tests are passed
 * UC2
-  * All tests are passed
   * Full functionality and all requirements implemented.
+  * All tests are passed
 * UC3
-  * All tests are passed
   * Full functionality and all requirements implemented.
+  * All tests are passed
   * See conflicts between test and requirement below.
 * UC4
-  * All tests are passed
   * Full functionality and all requirements implemented.
+  * All tests are passed
 * UC5
-  * All tests are passed
   * Full functionality and all requirements implemented.
+  * All tests are passed
 * UC6
-  * All tests are passed
   * Full functionality and all requirements implemented.
+  * All tests are passed
 * UC10
   * Full functionality and all requirements implemented.
   * See conflicts between test and requirement below.
