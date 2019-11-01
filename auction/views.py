@@ -225,6 +225,7 @@ def get_auction_version_from_session(request):
         "auction_id": request.session['auction_id'],
         "auction_version": request.session['auction_version']
     }
+    # Remove the version data from the session
     del request.session['auction_id']
     del request.session['auction_version']
     return bid_data
@@ -350,8 +351,15 @@ class Bid(View):
                     if auction.seller.username != request.user.username:
                         buyer = request.user
 
-                        # TODO: Make this better in production. Now if a user tries to manually POST after previously
+                        # TODO: Make this better in production. Now if a user tries to *manually* POST after previously
                         #  viewing some older version the POST will not work because the auction_version is old...
+                        #  (not an issue when using the web gui only, but if using the web gui and then manually post)
+                        #  The user needs to re-POST and it will work (as the version number vas removed from the
+                        #  session after the first POST)
+
+                        # TODO: Alternatively just send the version number in the post data since it
+                        #  is not security critical.
+
                         # Check that the user is bidding on the latest description (using version numbers)
                         try:
                             # Bidding on an auction after viewing some (any) auctions bid page (accessing GET method)
@@ -363,7 +371,7 @@ class Bid(View):
                             auction_id = ''
                             auction_version = ''
 
-                        # Do not allow to bid after viewing earlier version
+                        # Allow only to bid on the latest GETed version (or if not GETed at all)
                         if (auction.id == auction_id and auction.version == auction_version) or auction_id == '':
 
                             # Check deadline
@@ -389,7 +397,7 @@ class Bid(View):
                                     msg = "You has bid successfully"
                                     success = True
                                 else:
-                                    msg = "New bid must be greater than the current bid for at least 0.01. The auction information has been changed"
+                                    msg = "New bid must be greater than the current bid for at least 0.01."
                             else:
                                 msg = "You can only bid on active auctions. Deadline due."
                         else:
