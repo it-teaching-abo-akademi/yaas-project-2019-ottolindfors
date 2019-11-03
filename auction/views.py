@@ -4,6 +4,7 @@ from decimal import *
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.db.models import F
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -425,7 +426,6 @@ class Bid(View):
 @login_required
 def ban(request, item_id):
     if request.method == 'POST':
-        # TODO: Send emails to seller and all bidders after ban
         # Check permission
         if request.user.is_superuser:
             # Auction exists
@@ -435,6 +435,18 @@ def ban(request, item_id):
                 if auction.status == 'Active':
                     AuctionModel.objects.filter(id=item_id).update(status="Banned")
                     msg = "Ban successfully. Auction " + str(AuctionModel.objects.get(id=item_id).id) + " is now " + AuctionModel.objects.get(id=item_id).status
+
+                    # TODO: Send emails to seller and all bidders
+                    # Send email to all bidders + seller
+                    subject = 'Bid banned'
+                    message = 'The bid has been banned.'
+                    sender = 'bot@erwin.com'
+                    seller_email = auction.seller.email
+                    print(seller_email)
+                    recipient_list = auction.get_all_bidders_email()
+                    print("****************\nRecipients :")
+                    print(recipient_list)
+                    send_mail(subject=subject, message=message, from_email=sender, recipient_list=recipient_list)
                 else:
                     msg = "Auction status is " + auction.status
             else:

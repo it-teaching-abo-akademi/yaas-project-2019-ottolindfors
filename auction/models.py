@@ -29,10 +29,10 @@ class AuctionModel(models.Model):
         return round(current_price, 2)  # only two decimals
 
     def get_winning_bid(self):
-        return BidModel.objects.filter(auction=self, new_price=self.current_price)
+        return BidModel.objects.filter(auction=self, new_price=self.current_price)  # Maybe use .get() instead if error occur
 
     def get_winning_bidder(self):
-        return BidModel.objects.filter(auction=self, new_price=self.current_price).buyer
+        return BidModel.objects.filter(auction=self, new_price=self.current_price).buyer  # Maybe use .get() instead if error occur
 
     def get_second_place_bidder(self):
         # TODO: Fix error when index out of range (may some sort of .get() instead of [1])
@@ -43,6 +43,10 @@ class AuctionModel(models.Model):
             bidder = None
             # TODO: Handle this None return in auction:bid function
         return bidder
+
+    def get_all_bidders_email(self):
+        return list(BidModel.objects.filter(auction=self).values_list('buyer__email', flat=True))
+
 
     def increment_version(self):
         self.version += 1

@@ -65,7 +65,6 @@ class SignIn(View):
 
     def post(self, request):
         safe_destination = safeRedirectDestination(request)
-        print('SignIn post safe_destination: ' + str(safe_destination))
 
         # TODO: Check with Postman that this is working (it is not working)
         if safe_destination:
@@ -101,7 +100,6 @@ def safeRedirectDestination(request):
     # Prevent phishing attacks. Check that redirect is safe if present un the url (?next=)
     destination = request.GET.get('next')
     destination_safe = is_safe_url(destination, allowed_hosts=None)
-    print('destination: ' + str(destination))
 
     # If no redirect
     if destination is None:

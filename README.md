@@ -1,8 +1,7 @@
 # Project report - YAAS 2019
 
 Author: Otto Lindfors 37944
-## Implemented requirements
-## Passed tests
+## Implemented requirements and passed tests
 * UC1
   * Full functionality and all requirements implemented.
   * All tests are passed  
@@ -27,7 +26,7 @@ Author: Otto Lindfors 37944
   * Full functionality and all requirements implemented.
   * See conflicts between test and requirement below.  
   
-## Conflicts between requirements and tests
+## Conflicts in requirements and tests
 * REQ3.3, REQ3.3.1, REQ3.3.2
   * ​Requirement:  
   The user must be asked for a confirmation before creating a new auction.
