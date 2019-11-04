@@ -24,8 +24,12 @@ def index(request):
 
 @login_required
 def banned_auctions(request):
-    auctions = AuctionModel.objects.filter(status='Banned').order_by('id')  # nearest deadline first
-    return render(request, "banned.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
+    if request.user.is_superuser:
+        auctions = AuctionModel.objects.filter(status='Banned').order_by('id')  # nearest deadline first
+        return render(request, "banned.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
+    else:
+        messages.add_message(request, messages.INFO, 'Site not avalible')
+        return redirect(reverse('index'))
 
 
 def search(request):
@@ -474,4 +478,3 @@ def changeLanguage(request, lang_code):
 
 def changeCurrency(request, currency_code):
     pass
-

@@ -26,7 +26,6 @@ class SignUp(View):
     def post(self, request):
         safe_destination = safeRedirectDestination(request)
 
-        # TODO: Check with Postman that this is working
         if safe_destination:
             form = CustomUserCreationForm(request.POST)
 

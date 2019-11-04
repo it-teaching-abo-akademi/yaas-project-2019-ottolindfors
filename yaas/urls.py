@@ -19,6 +19,7 @@ from auction import rest_views
 import user.views
 import auction.views
 import auction.services
+import yaas.views
 
 # These are tha main urls for the website
 urlpatterns = [
@@ -31,7 +32,8 @@ urlpatterns = [
     path('signout/', user.views.signout, name='signout'),
     path('changeLanguage/<lang_code>/', auction.views.changeLanguage, name='changeLanguage'),
     path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency'),
-    path('api/auction/list/', rest_views.auction_list, name='rest-auction-list')
+    path('api/auction/list/', rest_views.auction_list, name='rest-auction-list'),
+    path('generatedata/', yaas.views.generate_data, name='generate-data')
 ]
 
 urlpatterns += [
