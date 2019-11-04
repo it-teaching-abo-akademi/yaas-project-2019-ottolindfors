@@ -79,7 +79,7 @@ Author: Otto Lindfors 37944
   
 
 ## Brower used for testing
-* Firefox 70.0 on macOS Catalina and Ubuntu 18.04 LTS
+* Firefox 70.0 on macOS Catalina 10.15 and Ubuntu 18.04 LTS
 
 ## List of Python packages
 * See requirements.txt
