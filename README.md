@@ -4,27 +4,38 @@ Author: Otto Lindfors 37944
 ## Implemented requirements and passed tests
 * UC1
   * Full functionality and all requirements implemented.
-  * All tests are passed  
+  * All tests are passed
+  * 1 p.
 * UC2
   * Full functionality and all requirements implemented.
-  * All tests are passed  
+  * All tests are passed
+  * 1 p.
 * UC3
   * Full functionality and all requirements implemented.
   * All tests are passed
-  * See conflicts between test and requirement below.  
+  * See conflicts between test and requirement below.
+  * 3 p.
 * UC4
   * Full functionality and all requirements implemented.
   * All tests are passed  
+  * 1 p.
 * UC5
   * Full functionality and all requirements implemented.
-  * All tests are passed  
+  * All tests are passed 
+  * 1 p. 
 * UC6
   * Full functionality and all requirements implemented.
   * All tests are passed
-  * See conflicts with requirements below.  
+  * See conflicts with requirements below.
+  * 3 p.  
+* UC7 
+  * Full functionality and all requirements implemented.
+  * All tests are passed
+  * 1 p.
 * UC10
   * Full functionality and all requirements implemented.
-  * See conflicts between test and requirement below.  
+  * See conflicts between test and requirement below.
+  * 2 p.
   
 ## Conflicts in requirements and tests
 * REQ3.3, REQ3.3.1, REQ3.3.2
