@@ -436,17 +436,13 @@ def ban(request, item_id):
                     AuctionModel.objects.filter(id=item_id).update(status="Banned")
                     msg = "Ban successfully. Auction " + str(AuctionModel.objects.get(id=item_id).id) + " is now " + AuctionModel.objects.get(id=item_id).status
 
-                    # TODO: Send emails to seller and all bidders
                     # Send email to all bidders + seller
                     subject = 'Bid banned'
                     message = 'The bid has been banned.'
                     sender = 'bot@erwin.com'
-                    seller_email = auction.seller.email
-                    print(seller_email)
                     recipient_list = auction.get_all_bidders_email()
-                    print("****************\nRecipients :")
-                    print(recipient_list)
                     send_mail(subject=subject, message=message, from_email=sender, recipient_list=recipient_list)
+                    send_mail(subject=subject, message=message, from_email=sender, recipient_list=[auction.seller.email])
                 else:
                     msg = "Auction status is " + auction.status
             else:

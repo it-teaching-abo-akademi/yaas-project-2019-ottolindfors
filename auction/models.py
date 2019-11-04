@@ -45,7 +45,7 @@ class AuctionModel(models.Model):
         return bidder
 
     def get_all_bidders_email(self):
-        return list(BidModel.objects.filter(auction=self).values_list('buyer__email', flat=True))
+        return list(BidModel.objects.filter(auction=self).values_list('buyer__email', flat=True).distinct())
 
 
     def increment_version(self):
