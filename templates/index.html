@@ -13,12 +13,6 @@
 
     <h2>Auctions</h2>
 
-    <form action="{% url 'auction:search' %}" method="get">
-        {% csrf_token %}
-        <input type="search" name="term">
-        <input type="submit" value="Search">
-    </form>
-
     {% for auction in auctions %}
 
         <h2>{{ auction.title }}</h2>
@@ -27,7 +21,7 @@
         <p>Version: {{ auction.version }}</p>
         <p>Starting price: {{ auction.minimum_price }}</p>
         <p>Current price: {{ auction.current_price }}</p>
-        <p>{{ auction.status }}</p>
+        <p style="color: limegreen">{{ auction.status }}</p>
         <p>Seller: {{ auction.seller }}</p>
         <p>Deadline: {{ auction.deadline_date }}</p>
         <p>Created: {{ auction.timestamp }}</p>

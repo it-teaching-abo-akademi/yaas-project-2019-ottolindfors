@@ -6,14 +6,25 @@
 <h1>Erwin's Auctions</h1>
 <h2>It can be anything until you open the box</h2>
 
+<form action="{% url 'auction:search' %}" method="get">
+    {% csrf_token %}
+    <input type="search" name="term" placeholder="Search auctions">
+    <input type="submit" value="Search">
+</form>
+
 {% if user.is_authenticated %}
+    <p>Signed in as {{ user.username }}</p>
     <ul>
         <li><a href="{% url "index" %}">Home</a></li>
         <li><a href="{% url "auction:create" %}">Create Auction</a></li>
         <li><a href="{% url "user:editprofile" %}">Edit profile</a></li>
         <li><a href="{% url "signout" %}">Sign out</a></li>
     </ul>
-    <p>Signed in as {{ user.username }}</p>
+    {% if request.user.is_superuser%}
+        <ul>
+            <li><a href="{% url "auction:banned-auctions"%}">Banned auctions</a></li>
+        </ul>
+    {% endif %}
 {% else %}
     <ul>
         <li><a href="{% url "signin" %}">Sign in</a></li>

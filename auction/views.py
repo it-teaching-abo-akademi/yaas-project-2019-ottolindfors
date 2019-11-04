@@ -22,6 +22,12 @@ def index(request):
     return render(request, "index.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
 
 
+@login_required
+def banned_auctions(request):
+    auctions = AuctionModel.objects.filter(status='Banned').order_by('id')  # nearest deadline first
+    return render(request, "banned.html", {"auctions": auctions, "time": timezone.localtime(timezone.now())})
+
+
 def search(request):
     if request.GET.get("term", "") != "":  # search by title
         criteria = request.GET["term"].lower().strip()
