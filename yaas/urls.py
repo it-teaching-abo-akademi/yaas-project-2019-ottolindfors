@@ -31,15 +31,15 @@ urlpatterns = [
     path('signin/', user.views.SignIn.as_view(), name='signin'),
     path('signout/', user.views.signout, name='signout'),
     path('changeLanguage/<lang_code>/', auction.views.changeLanguage, name='changeLanguage'),
-    path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency'),
-    path('api/auction/list/', rest_views.auction_list, name='rest-auction-list'),
-    path('generatedata/', yaas.views.generate_data, name='generate-data')
+    path('changeCurrency/<currency_code>/', auction.views.changeCurrency, name='changeCurrency')
 ]
 
 urlpatterns += [
+    # path('api/auction/list/', rest_views.auction_list, name='rest-auction-list'),
     path('api/v1/browse/', auction.services.BrowseAuctionApi.as_view(), name='browseauctionsapi'),
     re_path(r'^api/v1/search/(\w+)/?$', auction.services.SearchAuctionApi.as_view(), name='searchauctionapi'),
     re_path(r'^api/v1/search/\??(?:&?[^=&]*=[^=&]*)*', auction.services.SearchAuctionWithTermApi.as_view(), name='searchauctionwithtermapi'),
     re_path(r'^api/v1/searchid/(\d+)/$', auction.services.SearchAuctionApiById.as_view(), name='searchauctionbyidapi'),
     re_path(r'^api/v1/bid/(\d+)/$', auction.services.BidAuctionApi.as_view(), name='bidauctionapi'),
+    path('generatedata/', yaas.views.generate_data, name='generate-data')
 ]
