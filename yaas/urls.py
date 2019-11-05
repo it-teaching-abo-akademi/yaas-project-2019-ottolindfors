@@ -37,9 +37,11 @@ urlpatterns = [
 urlpatterns += [
     # path('api/auction/list/', rest_views.auction_list, name='rest-auction-list'),
     path('api/v1/browse/', auction.services.BrowseAuctionApi.as_view(), name='browseauctionsapi'),
-    re_path(r'^api/v1/search/(\w+)/?$', auction.services.SearchAuctionApi.as_view(), name='searchauctionapi'),
+    # re_path(r'^api/v1/search/(\w+)/?$', auction.services.SearchAuctionApi.as_view(), name='searchauctionapi'),
+    path('api/v1/search/<str:title>', auction.services.SearchAuctionApi.as_view(), name='searchauctionapi'),
     re_path(r'^api/v1/search/\??(?:&?[^=&]*=[^=&]*)*', auction.services.SearchAuctionWithTermApi.as_view(), name='searchauctionwithtermapi'),
-    re_path(r'^api/v1/searchid/(\d+)/$', auction.services.SearchAuctionApiById.as_view(), name='searchauctionbyidapi'),
+    # re_path(r'^api/v1/searchid/(\d+)/$', auction.services.SearchAuctionApiById.as_view(), name='searchauctionbyidapi'),
+    path('api/v1/searchid/<int:auction_id>', auction.services.SearchAuctionApiById.as_view(), name='searchauctionbyidapi'),
     re_path(r'^api/v1/bid/(\d+)/$', auction.services.BidAuctionApi.as_view(), name='bidauctionapi'),
     path('generatedata/', yaas.views.generate_data, name='generate-data')
 ]

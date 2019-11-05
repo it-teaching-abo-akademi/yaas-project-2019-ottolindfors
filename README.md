@@ -37,6 +37,10 @@ Author: Otto Lindfors 37944
   * Full functionality and all requirements implemented.
   * See conflicts between test and requirement below.
   * 2 p.
+* WS1
+  * Full functionality and all requirements implemented.
+  * All tests are passed
+  * 2 p.
   
 ## Conflicts in requirements and tests
 * UC1
