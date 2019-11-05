@@ -41,6 +41,9 @@ Author: Otto Lindfors 37944
   * Full functionality and all requirements implemented.
   * All tests are passed
   * 2 p.
+* WS2
+  * See conflicts between test and requirement below.
+
   
 ## Conflicts in requirements and tests
 * UC1
@@ -93,6 +96,23 @@ Author: Otto Lindfors 37944
     browser this means pressing the 'bid' button again.  
     This is of course a very ugly solution, but then again, this website is not intended to
     be used in production.
+
+* WS2
+  * Requirent:
+    * The error messages should be:    
+      1. “Cannot bid on own auction”  
+      2. “Can only bid on active auction”
+      3. “New bid must be greater than the current bid at least 0.01”
+  * Conflict:
+    * The error messages are:
+      1. “You cannot bid on own auction”  
+      2. “You can only bid on active auction”
+      3. “New bid must be greater than the current bid for at least 0.01”
+  * Solution:  
+    * This is not an issue.
+    * Since it is the same method that do the actual posting for the API as for the non-API 
+    the error messages are the same. Therefore the error messages do not match the requirements 
+    exactly.
 
 ## Brower used for testing
 * Firefox 70.0 on macOS Catalina 10.15 and Ubuntu 18.04 LTS

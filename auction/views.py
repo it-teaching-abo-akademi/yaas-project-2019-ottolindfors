@@ -221,6 +221,12 @@ def get_auction_from_session(request):
         "seller_username": request.session['seller_username']
     }
     # TODO: del request.session['title'], etc.
+    del request.session['title']
+    del request.session['description']
+    del request.session['minimum_price']
+    del request.session['deadline_date']
+    del request.session['seller_username']
+
     return auction_data
 
 
@@ -319,6 +325,7 @@ class EditAuctionNoSignIn(View):
             return redirect(reverse("index"))
 
 
+"""
 @method_decorator(login_required, name='dispatch')
 class Bid(View):
     def get(self, request, item_id):
@@ -431,6 +438,133 @@ class Bid(View):
         else:
             messages.add_message(request, messages.INFO, "Form is not valid")
             return redirect('index')
+"""
+
+
+@method_decorator(login_required, name='dispatch')
+class Bid(View):
+    def get(self, request, item_id):
+        # Auction exists
+        if AuctionModel.objects.filter(id=item_id).exists():
+            auction = AuctionModel.objects.get(id=item_id)
+            # Check that auction is active
+            if auction.status == "Active":
+                # Check that user (bidder) is not the seller is done in post()
+                # Check deadline
+                if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(seconds=1):
+                    inidata = {"new_price": auction.current_price}
+                    form = BidForm(initial=inidata)
+                    # Save to session what version of the auction that is accessed (for concurrency)
+                    save_auction_version_to_session(request, item_id, auction.version)
+                    return render(request, "bid.html", {"auction": auction, "form": form, "item_id": item_id})
+                else:
+                    msg = "You can only bid on active auctions. Deadline due."
+            else:
+                msg = "You can only bid on active auctions"
+            messages.add_message(request, messages.INFO, msg)
+            return redirect('index')
+        else:
+            msg = "Invalid auction id"
+            messages.add_message(request, messages.INFO, msg)
+            return redirect('index')
+
+    def post(self, request, item_id):
+        form = BidForm(request.POST)
+        if form.is_valid():
+            result_dict = do_bid(request, item_id)
+            status = result_dict['status']
+            msg = result_dict['msg']
+            if status == 'success':
+                messages.add_message(request, messages.INFO, msg)
+                return redirect('index')
+            elif status == 'fail-redirect-to-index':
+                messages.add_message(request, messages.INFO, msg)
+                return redirect('index')
+            elif status == 'fail-rerender':
+                auction = AuctionModel.objects.get(id=item_id)
+                messages.add_message(request, messages.INFO, msg)
+                return render(request, "bid.html", {"auction": auction, "form": form, "item_id": item_id})
+            else:
+                msg = msg + '. Unexpected error'
+                messages.add_message(request, messages.INFO, msg)
+                return redirect('index')
+        else:
+            messages.add_message(request, messages.INFO, "Form is not valid")
+            return redirect('index')
+
+
+# Only executable by the server (no url pointing to method)
+@login_required
+def do_bid(request, item_id):
+
+    # Check that auction exist
+    if AuctionModel.objects.filter(id=item_id).exists():
+        auction = AuctionModel.objects.get(id=item_id)
+        success = False
+
+        # Check that auction is active
+        if auction.status == "Active":
+
+            # Check that user (bidder) is not the seller
+            if auction.seller.username != request.user.username:
+                buyer = request.user
+
+                # Check that the user is bidding on the latest description (using version numbers)
+                try:
+                    # Bidding on an auction after viewing some (any) auctions bid page (accessing GET method)
+                    last_viewed_auction_version = get_auction_version_from_session(request)
+                    auction_id = last_viewed_auction_version.get('auction_id', '')
+                    auction_version = last_viewed_auction_version.get('auction_version', '')
+                except KeyError:
+                    # Bidding on auction without first viewing it
+                    auction_id = ''
+                    auction_version = ''
+
+                # Allow only to bid on the latest GETed version (or if not GETed at all)
+                if (auction.id == auction_id and auction.version == auction_version) or auction_id == '':
+
+                    # Check deadline
+                    if auction.deadline_date - timezone.localtime(timezone.now()) > timedelta(
+                            seconds=3):  # give 3 seconds processing time
+
+                        # Check that new_price is valid. Round to two decimals
+                        new_price = round(Decimal(request.POST.get('new_price', '')), 2)
+                        min_increment = round(Decimal('0.01'), 2)
+                        if new_price - auction.current_price >= min_increment:
+
+                            # Save the new_bid
+                            new_bid = BidModel(new_price=new_price, buyer=buyer, auction=auction)
+                            new_bid.save()
+
+                            # Send email
+                            subject = 'New bid'
+                            message = 'A new bid has been placed.'
+                            sender = 'bot@erwin.com'
+                            second_place_bidder = auction.get_second_place_bidder()
+                            second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
+                            auction.seller.email_user(subject=subject, message=message, from_email=sender)
+
+                            msg = "You has bid successfully"
+                            success = True
+                        else:
+                            msg = "New bid must be greater than the current bid for at least 0.01."
+                    else:
+                        msg = "You can only bid on active auctions. Deadline due."
+                else:
+                    msg = "Bid rejected. The auction information has been changed."
+            else:
+                msg = "You cannot bid on your own auctions"
+        else:
+            msg = "You can only bid on active auctions"
+
+        if success:
+            return {'status': 'success', 'msg': msg}
+        else:
+            # Tell caller method to rerender the form
+            return {'status': 'fail-rerender', 'msg': msg}
+    else:
+        msg = 'Invalid auction id'
+        return {'status': 'fail-redirect-to-index', 'msg': msg}
 
 
 @login_required
