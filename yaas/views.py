@@ -49,22 +49,8 @@ def generate_data(request):
             new_auction.save()
             msg_auctions = msg_auctions + 'Title ' + i_str + ', '
 
-
-    # # CREATE SUPERUSER
-    # superuser_info = {
-    #     "username": "admin",
-    #     "password": "admin",
-    #     "email": "admin@erwin.com"
-    # }
-    # form = CustomUserCreationForm(superuser_info)
-    #
-    # if form.is_valid():
-    #     print('here')
-    #     new_superuser = form.save()
-    #     # TODO: Fix so that new_superuser becomes superuser (if possible)
-    #     new_superuser.is_superuser = True
-
     messages.add_message(request, messages.INFO, msg_users)
     messages.add_message(request, messages.INFO, msg_auctions)
+    messages.add_message(request, messages.INFO, 'Admin users are created using the admin interface (manage.py or django-admin)')
 
     return redirect(reverse('index'))

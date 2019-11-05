@@ -5,6 +5,7 @@ Author: Otto Lindfors 37944
 * UC1
   * Full functionality and all requirements implemented.
   * All tests are passed
+  * See conflicts in requirements below.
   * 1 p.
 * UC2
   * Full functionality and all requirements implemented.
@@ -38,6 +39,17 @@ Author: Otto Lindfors 37944
   * 2 p.
   
 ## Conflicts in requirements and tests
+* UC1
+  * (Not really an issue)
+  * Constraint:  
+  ​We assume that administrator accounts are created using the Django admin interface. For this, you must 
+  enable the Django admin interface in your project.
+  * Conflict:  
+  One cannot access the admin interface without first creating a superuser. Therefore a superuser needs 
+  to be created using manage.py.
+  * Solution:  
+  Assume you mean Django’s command-line utility for admin tasks (manage.py and django-admin).
+
 * REQ3.3, REQ3.3.1, REQ3.3.2
   * ​Requirement:  
   The user must be asked for a confirmation before creating a new auction.
