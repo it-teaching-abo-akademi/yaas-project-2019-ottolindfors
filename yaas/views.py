@@ -7,8 +7,9 @@ from auction.models import AuctionModel
 from decimal import *
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from user.forms import CustomUserCreationForm
+from user.models import UserLanguageModel
 
 
 def generate_data(request):
@@ -31,6 +32,15 @@ def generate_data(request):
         if form.is_valid():
             new_user = form.save()
             msg_users = msg_users + new_user.username + ', '
+
+            # CREATE USER LANGUAGES
+            # Set language
+            try:
+                language = request.session[translation.LANGUAGE_SESSION_KEY]
+            except KeyError:
+                language = 'en'
+            user_language = UserLanguageModel(user=new_user, language=language)
+            user_language.save()
 
             # CREATE AUCTIONS
             deadline_date = timezone.now() + timezone.timedelta(days=5)

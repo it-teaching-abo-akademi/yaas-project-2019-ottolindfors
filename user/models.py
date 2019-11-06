@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
+from yaas import settings
+
 '''
 1.
 Django docs: https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#substituting-a-custom-user-model
@@ -47,4 +49,12 @@ class CustomUser(AbstractUser):
         'email address',
         unique=True,
         error_messages={'unique': "This email has been taken"}
+    )
+
+
+class UserLanguageModel(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    language = models.CharField(
+        max_length=255,
+        default="en"
     )

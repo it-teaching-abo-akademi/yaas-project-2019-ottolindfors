@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 from django.views import View
 from django.urls import reverse
 
-from user.models import CustomUser
+from user.models import CustomUser, UserLanguageModel
 from .models import AuctionModel, BidModel
 from .forms import CreateAuctionForm, BidForm
 
@@ -609,11 +609,19 @@ def resolve(request):
 
 
 def changeLanguage(request, lang_code):
+    # Change language
     translation.activate(lang_code)
     request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
+
+    # Save the language for the user so that is persist also after sign out
+    try:
+        UserLanguageModel.objects.filter(user=request.user).update(language=lang_code)
+    except TypeError:
+        pass
+
     msg = _("Language changed to ") + lang_code
     messages.add_message(request, messages.INFO, msg)
-    return redirect('index')
+    return redirect(request.META['HTTP_REFERER'])
 
 
 def changeCurrency(request, currency_code):

@@ -33,6 +33,14 @@ Author: Otto Lindfors 37944
   * Full functionality and all requirements implemented.
   * All tests are passed
   * 1 p.
+* UC9
+  * Full functionality and all requirements implemented.
+  * Test do not pass. See conflicts with requirements below.
+  * 2 p.
+* REQ 9.3
+  * Full functionality and all requirements implemented.
+  * No test provided
+  * 1 p.
 * UC10
   * Full functionality and all requirements implemented.
   * See conflicts between test and requirement below.
@@ -96,6 +104,17 @@ Author: Otto Lindfors 37944
     browser this means pressing the 'bid' button again.  
     This is of course a very ugly solution, but then again, this website is not intended to
     be used in production.
+    
+* UC9
+  * Requirement:  
+  Status code `200` after successful change of language
+  * Conflict:  
+  I have a link (url) the user clicks to change the language. In the method that changes the language I use 
+  `return redirect(request.META['HTTP_REFERER'])` to reload the previous page (from where the user clicked the link)
+  so that the changes take effect. This will give status code `302` and then `200`. The full functionality is 
+  still implemented.  
+  An alternative solution would have been to reload the page using javascript but that is not in the scope of this 
+  course.
 
 * WS2
   * Requirent:
@@ -121,7 +140,8 @@ Author: Otto Lindfors 37944
 Django==2.2.5  
 djangorestframework==3.10.3  
 freezegun==0.3.12  
-requests==2.22.0
+requests==2.22.0  
+apscheduler==3.6.3
 
 ## Other packages
 gettext==0.20.1

@@ -4,12 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.views import View
 
 from user.forms import CustomUserCreationForm, CustomUserEditForm
-from user.models import CustomUser
+from user.models import CustomUser, UserLanguageModel
 
 
 class SignUp(View):
@@ -33,9 +34,17 @@ class SignUp(View):
                 # Save the user with the save() function in CustomUserCreationForm
                 new_user = form.save()
 
+                # Set language
+                try:
+                    language = request.session[translation.LANGUAGE_SESSION_KEY]
+                except KeyError:
+                    language = 'en'
+                user_language = UserLanguageModel(user=new_user, language=language)
+                user_language.save()
+
                 # Messages
                 messages.add_message(request, messages.INFO, "User created")
-                user_info = "username " + new_user.username + ", email " + new_user.email
+                user_info = "username " + new_user.username + ", email " + new_user.email + ", language " + user_language.language
                 messages.add_message(request, messages.INFO, user_info)
 
                 # Sign in the user for ease of use
@@ -65,7 +74,6 @@ class SignIn(View):
     def post(self, request):
         safe_destination = safeRedirectDestination(request)
 
-        # TODO: Check with Postman that this is working (it is not working)
         if safe_destination:
             username = request.POST.get('username', '')  # Empty '' tells the get method to return '' if username not found
             password = request.POST.get('password', '')  # Is this secure?
@@ -80,6 +88,11 @@ class SignIn(View):
             else:
                 # Log in the user
                 auth.login(request, user)
+
+                # TODO: Change language to users prefered language stored in the user model
+                lang_code = UserLanguageModel.objects.get(user=user).language
+                translation.activate(lang_code)
+                request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
 
                 messages.add_message(request, messages.INFO, "Welcome! Signed in.")
                 print("SIGNED IN: " + username)
