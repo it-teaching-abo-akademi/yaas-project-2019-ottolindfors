@@ -89,7 +89,7 @@ class SignIn(View):
                 # Log in the user
                 auth.login(request, user)
 
-                # TODO: Change language to users prefered language stored in the user model
+                # Change language
                 lang_code = UserLanguageModel.objects.get(user=user).language
                 translation.activate(lang_code)
                 request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
@@ -197,38 +197,3 @@ class EditProfile(View):
         else:
             messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
             return redirect("index")
-
-        # TODO: Figure outh why hte form will not validate
-        # if safe_destination:
-        #     new_email = request.POST.get('email', '').strip()
-        #     new_password = request.POST.get('password', '').strip()
-        #     print('.' + new_email + '.', '.' + new_password + '.')
-        #     user_in_db = CustomUser.objects.filter(username=request.user.username)
-        #     update = False
-        #     if new_email != '' and new_password != '':
-        #         print('#')
-        #         form = CustomUserEditForm({'email': new_email, 'password': new_password}, instance=user_in_db)
-        #         update = True
-        #     elif new_email != '' and new_password == '':
-        #         print('##')
-        #         form = CustomUserEditForm({'email': new_email}, instance=user_in_db)
-        #         update = True
-        #     elif new_email == '' and new_password != '':
-        #         print('## #')
-        #         form = CustomUserEditForm({'password': new_password}, instance=user_in_db)
-        #         update = True
-        #
-        #     if update:
-        #         print('## ##')
-        #         if form.is_valid():
-        #             print('## ## #')
-        #             form.save()
-        #             messages.add_message(request, messages.INFO, "Profile updated")
-        #             return redirect('index')
-        #     else:
-        #         print('## ## ##')
-        #         messages.add_message(request, messages.INFO, "Nothing updated")
-        #         return redirect('index')
-        # else:
-        #     messages.add_message(request, messages.INFO, "Back to safety! Malicious attempt to redirect.")
-        #     return redirect("index")
