@@ -1,8 +1,4 @@
-from decimal import Decimal
-
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
-from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 from rest_framework.decorators import renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
