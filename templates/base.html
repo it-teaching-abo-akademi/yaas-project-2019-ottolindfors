@@ -3,14 +3,19 @@
 <html lang="en">
 <body>
 
-<h1>Erwin's Auctions</h1>
-<h2>It can be anything until you open the box</h2>
+<h1>{% trans "Erwin's Auctions"%}</h1>
+<h2>{% trans "It can be anything until you open the box" %}</h2>
 
 <form action="{% url 'auction:search' %}" method="get">
     {% csrf_token %}
     <input type="search" name="term" placeholder="Search auctions">
     <input type="submit" value="Search">
 </form>
+
+<ul>
+    <li><a href="{% url 'changeLanguage' 'en'%}">English</a></li>
+    <li><a href="{% url 'changeLanguage' 'sv'%}">Swedish</a></li>
+</ul>
 
 {% if user.is_authenticated %}
     <p>Signed in as {{ user.username }}</p>

@@ -1,4 +1,5 @@
 import uuid
+
 from datetime import datetime, timedelta
 from decimal import *
 
@@ -7,8 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db.models import F
 from django.shortcuts import render, redirect
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django.views import View
 from django.urls import reverse
 
@@ -544,7 +546,7 @@ def do_bid(request, item_id):
                             second_place_bidder.email_user(subject=subject, message=message, from_email=sender)
                             auction.seller.email_user(subject=subject, message=message, from_email=sender)
 
-                            msg = "You has bid successfully"
+                            msg = _("You has bid successfully")
                             success = True
                         else:
                             msg = "New bid must be greater than the current bid for at least 0.01."
@@ -607,7 +609,11 @@ def resolve(request):
 
 
 def changeLanguage(request, lang_code):
-    pass
+    translation.activate(lang_code)
+    request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
+    msg = _("Language changed to ") + lang_code
+    messages.add_message(request, messages.INFO, msg)
+    return redirect('index')
 
 
 def changeCurrency(request, currency_code):

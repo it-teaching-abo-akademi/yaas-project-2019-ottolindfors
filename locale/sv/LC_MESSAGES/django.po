@@ -1,0 +1,40 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-06 17:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: auction/views.py:549
+msgid "You has bid successfully"
+msgstr "Ditt bud har registrerats"
+
+#: auction/views.py:614
+#, fuzzy
+#| msgid "language changed to "
+msgid "Language changed to "
+msgstr "Språket ändrat till "
+
+#: templates/base.html:6
+msgid "Erwin's Auctions"
+msgstr "Erwins Auctioner"
+
+#: templates/base.html:7
+msgid "It can be anything until you open the box"
+msgstr "Det kan vara vad som helst tills du öppnar paketet"
+
+#~ msgid "Språket ändrat till "
+#~ msgstr "Language changed to "
