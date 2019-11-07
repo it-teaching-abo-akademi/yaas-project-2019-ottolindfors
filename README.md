@@ -26,6 +26,9 @@ turned off all tests listed below will pass.
   * All tests are passed
   * See conflicts between test and requirement below.
   * 3 p.
+* REQ3.5
+  * Full functionality and all requirements implemented.
+  * 1 p.
 * UC4
   * Full functionality and all requirements implemented.
   * All tests are passed  
@@ -61,13 +64,19 @@ turned off all tests listed below will pass.
   * 2 p.
 * WS2
   * See conflicts between test and requirement below.
+  * 2 p.
+* TREQ4.2
+  * Full functionality and all requirements implemented.
+  * Creates 100 users and 100 auctions.
+  * Admin user needs to be created via admin interface manage.py or django-admin as stated in the specs.
+  * 2 p.
 
   
 ## Conflicts in requirements and tests
 * UC1
   * (Not really an issue)
   * Constraint:  
-  ​We assume that administrator accounts are created using the Django admin interface. For this, you must 
+  We assume that administrator accounts are created using the Django admin interface. For this, you must 
   enable the Django admin interface in your project.
   * Conflict:  
   One cannot access the admin interface without first creating a superuser. Therefore a superuser needs 
@@ -76,7 +85,7 @@ turned off all tests listed below will pass.
   Create admin (superuser) using Django’s command-line utility for admin tasks (manage.py and django-admin).
 
 * REQ3.3, REQ3.3.1, REQ3.3.2
-  * ​Requirement:  
+  * Requirement:  
   The user must be asked for a confirmation before creating a new auction.
   * Conflict:  
   The testTDD only works without the confirmation. Therefore the confirmation can be disabled.
