@@ -1,0 +1,12 @@
+apscheduler==3.6.3
+
+
+When the server start schedulers should be created for the auctions deadlines.
+
+The schedulers should execute the method that resolve a particular auction.
+
+The resolve method should pick a winner and notify by email the persons that should be notified.
+
+Maybe hints:
+https://medium.com/@bencleary/django-scheduled-tasks-queues-part-1-62d6b6dc24f8
+https://stackoverflow.com/questions/47633704/execute-task-on-specific-time-in-django

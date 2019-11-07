@@ -141,7 +141,6 @@ Django==2.2.5
 djangorestframework==3.10.3  
 freezegun==0.3.12  
 requests==2.22.0  
-apscheduler==3.6.3
 
 ## Other packages
 gettext==0.20.1
