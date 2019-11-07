@@ -79,7 +79,8 @@ class CreateAuction(View):
                 seller = request.user
 
                 # TODO: toggle to False to pass tests
-                ask_for_confirmation = False
+                # Ask for confirmation.
+                ask_for_confirmation = True
                 if ask_for_confirmation:
                     # Save to session
                     save_auction_to_session(
@@ -102,6 +103,7 @@ class CreateAuction(View):
                             "seller_username": seller.username
                         }
                     )
+                # This else statement is only here so that the testTDD pass.
                 else:
                     token = str(uuid.uuid4())  # Unique token for editing without login
                     while len(AuctionModel.objects.filter(token=token)) != 0:

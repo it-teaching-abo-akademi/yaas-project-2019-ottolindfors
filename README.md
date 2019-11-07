@@ -2,6 +2,16 @@
 
 Author: Otto Lindfors 37944
 ## Implemented requirements and passed tests
+
+### Very important information
+I have configured the app so that it by default will ask for confirmation when creating an auction. But this
+makes almost all the tests fail. Therefore I have made it easy for you to turn off the confirmation. When 
+turned off all tests listed below will pass.  
+  
+To turn of the create-auction-confirmation navigate the project files to:  
+`auction.views.CreateAuction.post()` and set `ask_for_confirmation = True`. This is on `row 83`.
+
+### List of implemented requirements and passed tests
 * UC1
   * Full functionality and all requirements implemented.
   * All tests are passed
@@ -69,9 +79,9 @@ Author: Otto Lindfors 37944
   * ​Requirement:  
   The user must be asked for a confirmation before creating a new auction.
   * Conflict:  
-  The testTDD only works without the confirmation. Therefore the confirmation is disabled.
+  The testTDD only works without the confirmation. Therefore the confirmation can be disabled.
   * Solution:  
-  To enable confirmation toggle the variable in auction > views > CreateAuction > post() > ask_for_confirmation = True
+  To enable/disable confirmation toggle the variable in auction > views > CreateAuction > post() > ask_for_confirmation = True/False
 
 * UC6 & UC10
   * Requirement:  
