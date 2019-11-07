@@ -9,7 +9,7 @@ makes almost all the tests fail. Therefore I have made it easy for you to turn o
 turned off all tests listed below will pass.  
   
 To turn of the create-auction-confirmation navigate the project files to:  
-`auction.views.CreateAuction.post()` and set `ask_for_confirmation = True`. This is on `row 83`.
+`auction.views.CreateAuction.post()` on `row 83` and set `ask_for_confirmation = True`.
 
 ### List of implemented requirements and passed tests
 * UC1
