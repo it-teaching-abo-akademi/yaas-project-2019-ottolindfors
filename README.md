@@ -48,6 +48,8 @@ turned off all tests listed below will pass.
   * 1 p.
 * UC9
   * Full functionality and all requirements implemented.
+  * Just some basic stuff such as the page name and slogan are translated to demonstarte the functionality.
+  Some messages such as "Auction created successfully" are also translated.
   * Test do not pass. See conflicts with requirements below.
   * 2 p.
 * REQ 9.3
