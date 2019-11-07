@@ -85,7 +85,6 @@ turned off all tests listed below will pass.
   to be created using manage.py.
   * Solution:  
   Create admin (superuser) using Django’s command-line utility for admin tasks (manage.py and django-admin).
-
 * REQ3.3, REQ3.3.1, REQ3.3.2
   * Requirement:  
   The user must be asked for a confirmation before creating a new auction.
@@ -93,7 +92,6 @@ turned off all tests listed below will pass.
   The testTDD only works without the confirmation. Therefore the confirmation can be disabled.
   * Solution:  
   To enable/disable confirmation toggle the variable in auction > views > CreateAuction > post() > ask_for_confirmation = True/False
-
 * UC6 & UC10
   * Requirement:  
   The application must show the most recent description of the auction before accepting bids from the user.
@@ -125,7 +123,6 @@ turned off all tests listed below will pass.
     browser this means pressing the 'bid' button again.  
     This is of course a very ugly solution, but then again, this website is not intended to
     be used in production.
-    
 * UC9
   * Requirement:  
   Status code `200` after successful change of language
@@ -136,7 +133,6 @@ turned off all tests listed below will pass.
   still implemented.  
   An alternative solution would have been to reload the page using javascript but that is not in the scope of this 
   course.
-
 * WS2
   * Requirent:
     * The error messages should be:    
