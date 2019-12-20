@@ -1,6 +1,6 @@
 # Project report - YAAS 2019
 
-Author: Otto Lindfors 37944
+Author: Otto Lindfors
 ## Implemented requirements and passed tests
 
 ### Very important information
