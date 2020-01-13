@@ -7,8 +7,8 @@ Author: Otto Lindfors
 I have configured the app so that it by default will ask for confirmation when creating an auction. But this
 makes almost all the provided tests fail. 
   
-To turn of the create-auction-confirmation navigate the project files to:  
-`auction.views.CreateAuction.post()` and set `ask_for_confirmation = True`. This is on `row 83`.
+**To turn of the create-auction-confirmation** navigate the project files to:  
+`auction.views.CreateAuction.post()` on `row 83` and set `ask_for_confirmation = True`.
 
 ### Project requirements
 [Project specifications](https://github.com/it-teaching-abo-akademi/yaas-project-2019-ottolindfors/blob/master/backlog/New_WebServices-ProjectSpecification2019_v1.1.pdf)  
@@ -29,6 +29,9 @@ To turn of the create-auction-confirmation navigate the project files to:
   * All tests are passed
   * See conflicts between test and requirement below.
   * 3 p.
+* REQ3.5
+  * Full functionality and all requirements implemented.
+  * 1 p.
 * UC4
   * Full functionality and all requirements implemented.
   * All tests are passed  
@@ -48,6 +51,8 @@ To turn of the create-auction-confirmation navigate the project files to:
   * 1 p.
 * UC9
   * Full functionality and all requirements implemented.
+  * Just some basic stuff such as the page name and slogan are translated to demonstarte the functionality.
+  Some messages such as "Auction created successfully" are also translated.
   * Test do not pass. See conflicts with requirements below.
   * 2 p.
 * REQ 9.3
@@ -64,28 +69,32 @@ To turn of the create-auction-confirmation navigate the project files to:
   * 2 p.
 * WS2
   * See conflicts between test and requirement below.
+  * 2 p.
+* TREQ4.2
+  * Full functionality and all requirements implemented.
+  * Creates 100 users and 100 auctions.
+  * Admin user needs to be created via admin interface manage.py or django-admin as stated in the specs.
+  * 2 p.
 
   
 ## Conflicts in requirements and tests
 * UC1
   * (Not really an issue)
   * Constraint:  
-  ​We assume that administrator accounts are created using the Django admin interface. For this, you must 
+  We assume that administrator accounts are created using the Django admin interface. For this, you must 
   enable the Django admin interface in your project.
   * Conflict:  
   One cannot access the admin interface without first creating a superuser. Therefore a superuser needs 
   to be created using manage.py.
   * Solution:  
   Create admin (superuser) using Django’s command-line utility for admin tasks (manage.py and django-admin).
-
 * REQ3.3, REQ3.3.1, REQ3.3.2
-  * ​Requirement:  
+  * Requirement:  
   The user must be asked for a confirmation before creating a new auction.
   * Conflict:  
   The testTDD only works without the confirmation. Therefore the confirmation can be disabled.
   * Solution:  
   To enable/disable confirmation toggle the variable in auction > views > CreateAuction > post() > ask_for_confirmation = True/False
-
 * UC6 & UC10
   * Requirement:  
   The application must show the most recent description of the auction before accepting bids from the user.
@@ -117,7 +126,6 @@ To turn of the create-auction-confirmation navigate the project files to:
     browser this means pressing the 'bid' button again.  
     This is of course a very ugly solution, but then again, this website is not intended to
     be used in production.
-    
 * UC9
   * Requirement:  
   Status code `200` after successful change of language
@@ -128,7 +136,6 @@ To turn of the create-auction-confirmation navigate the project files to:
   still implemented.  
   An alternative solution would have been to reload the page using javascript but that is not in the scope of this 
   course.
-
 * WS2
   * Requirent:
     * The error messages should be:    
