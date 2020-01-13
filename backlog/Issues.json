@@ -5,7 +5,7 @@
         "METHOD": "user.views.SignUp.post()",
         "EXPECTED_BEHAVIOUR": "Sign up with valid data, return code 302 (redirect).",
         "DESCRIPTION_OF_ISSUE": "Status code is 200 according to testTDD.py",
-        "SOLUTION": "Potential solution. Try not to use CustomUser but instead manually check if the email already exist in the CreateAuction(View)"
+        "SOLUTION": ""
     },
     {
         "ISSUE":"002",
@@ -13,7 +13,7 @@
         "METHOD":"user.views.SignIn.post()",
         "EXPECTED_BEHAVIOUR":"UC3 tests pass: ..._with_invalid_deadline_date_format, _with_invalid_minimum_price, _get_create_auction_form.",
         "DESCRIPTION_OF_ISSUE":"Tests are unable to sign in. Perhaps something to do with CustomUser. Tests pass when removing @require_login from CreateAuction view. EditAuction test in UC4 pass though. _get_create_auction_form gives AssertionError 302!=200 probably signin that fails.",
-        "SOLUTION": "Wrong error messages?"
+        "SOLUTION": ""
     },
     {
         "ISSUE":"003",
