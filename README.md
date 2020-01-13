@@ -3,13 +3,16 @@
 Author: Otto Lindfors
 ## Implemented requirements and passed tests
 
-### Very important information
+### Important information about the provided tests
 I have configured the app so that it by default will ask for confirmation when creating an auction. But this
-makes almost all the tests fail. Therefore I have made it easy for you to turn off the confirmation. When 
-turned off all tests listed below will pass.  
+makes almost all the provided tests fail. 
   
 To turn of the create-auction-confirmation navigate the project files to:  
 `auction.views.CreateAuction.post()` and set `ask_for_confirmation = True`. This is on `row 83`.
+
+### Project requirements
+[Project specifications](https://github.com/it-teaching-abo-akademi/yaas-project-2019-ottolindfors/blob/master/backlog/New_WebServices-ProjectSpecification2019_v1.1.pdf)  
+[Project API specifications](https://github.com/it-teaching-abo-akademi/yaas-project-2019-ottolindfors/blob/master/backlog/New_YaaSAPIspecification_V1.1.pdf)
 
 ### List of implemented requirements and passed tests
 * UC1
