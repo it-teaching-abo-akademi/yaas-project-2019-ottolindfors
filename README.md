@@ -1,6 +1,8 @@
 # Table of contents
-
-  * 1 [Description](#description)  
+  * 1 [Description](#description) 
+    * 1.1 [General](#general)
+    * 1.2 [RESTful API](#resful-api)
+    * 1.3 [Multiple Languages](#multiple-languages)
   * 2 [Project report - YAAS 2019](#project-report---yaas-2019)  
     * 2.1 [Implemented requirements and passed tests](#implemented-requirements-and-passed-tests)  
       * 2.1.1 [Important information about the provided tests](#important-information-about-the-provided-tests)  
@@ -16,25 +18,32 @@
     * 3.3 [Compile languages (use gettext)](#compile-languages-use-gettext)
 
 # 1 Description
+## 1.1 General
+Erwins Auctions is an web application for auctioning implemetned using the Django framework. Anonymous (unregistered) users can browse, view and search for auctions. Registered users can create auctions, modify acutions, bid on auctions, and edit their profile. Admins can ban auctions and also view banned auctions (in addition to the standard features included in the Django admin page). 
 
+## 1.2 RESTful API
+The application has an RESTful API for browsing, searching and bidding on auctions. 
+
+## 1.3 Multiple Languages
+The application supports swithcing languages. For registered users the language preference is presistent. This means the application remember an anonymous user's language preference through the identification of the user with the session cookie. For registered users the site will be shown in the user's prefered language when signed in.
 
 # 2 Project report - YAAS 2019
 
 Author: Otto Lindfors
-## Implemented requirements and passed tests
+## 2.1 Implemented requirements and passed tests
 
-### Important information about the provided tests
+### 2.1.1 Important information about the provided tests
 I have configured the app so that it by default will ask for confirmation when creating an auction. But this
 makes almost all the provided tests fail. 
   
 **To turn of the create-auction-confirmation** navigate the project files to:  
 `auction.views.CreateAuction.post()` on `row 83` and set `ask_for_confirmation = True`.
 
-### Project requirements
+### 2.1.2 Project requirements
 [Project specifications](https://github.com/it-teaching-abo-akademi/yaas-project-2019-ottolindfors/blob/master/backlog/New_WebServices-ProjectSpecification2019_v1.1.pdf)  
 [Project API specifications](https://github.com/it-teaching-abo-akademi/yaas-project-2019-ottolindfors/blob/master/backlog/New_YaaSAPIspecification_V1.1.pdf)
 
-### List of implemented requirements and passed tests
+### 2.1.3 List of implemented requirements and passed tests
 * UC1
   * Full functionality and all requirements implemented.
   * All tests are passed
@@ -97,7 +106,7 @@ makes almost all the provided tests fail.
   * 2 p.
 
   
-### Conflicts in requirements and tests
+### 2.1.4 Conflicts in requirements and tests
 * UC1
   * (Not really an issue)
   * Constraint:  
@@ -173,26 +182,26 @@ makes almost all the provided tests fail.
     the error messages are the same. Therefore the error messages do not match the requirements 
     exactly.
 
-## Brower used for testing
+## 2.2 Brower used for testing
 * Firefox 70.0 on macOS Catalina 10.15 and Ubuntu 18.04 LTS
 
-## List of installed Python packages
+## 2.3 List of installed Python packages
 Django==2.2.5  
 djangorestframework==3.10.3  
 freezegun==0.3.12  
 requests==2.22.0  
 
-## Other packages
+## 2.4 Other packages
 gettext==0.20.1
 
 
-# Instructions for gettext on macOS
+# 3 Instructions for gettext on macOS
 
 All the commands in these instructions are meant to be run in a terminal. 
 These instructions where made on macOS Catalina using zsh but they should work in bash as well and probably 
 also in some other shells.
 
-## Install Homebrew
+## 3.1 Install Homebrew
 Using Homebrew is by far the easiest way to cleanly install and cleanly uninstall gettext. Using Homebrew won't 
 mess up or even touch macOS's default gettext packages as it installs everyting in an isolated folder.
 
@@ -202,7 +211,7 @@ Follow the instructions on https://brew.sh/
 If you like to opt-out from Homebrew's analytics use  
 ```brew analytics off```
 
-## Install gettext
+## 3.2 Install gettext
 Install gettext with homebrew  
 ```brew install gettext```
 
@@ -227,7 +236,7 @@ export PATH=$TEMP_PATH
 unset TEMP_PATH
 ```
  
-## Compile languages (use gettext)
+## 3.3 Compile languages (use gettext)
 PyCharm will not (for some reason) find gettext when you run `makemessages -l sv` from the `manage.py` task. Therefore 
 you need to run the `manage.py` task yourself from within your virtualenvironment.  
 
