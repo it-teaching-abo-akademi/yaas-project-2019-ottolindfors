@@ -1,4 +1,24 @@
-# Project report - YAAS 2019
+# Table of contents
+
+  1. [Description](#description)  
+  2. [Project report - YAAS 2019](#project-report---yaas-2019)  
+    2.1 [Implemented requirements and passed tests](#implemented-requirements-and-passed-tests)  
+      2.1.1 [Important information about the provided tests](#important-information-about-the-provided-tests)  
+      2.1.2 [Project requirements](#project-requirements)  
+      2.1.3 [List of implemented requirements and passed tests](#list-of-implemented-requirements-and-passed-tests)  
+      2.1.4 [Conflicts in requirements and tests](#conflicts-in-requirements-and-tests)  
+    2.2 [Brower used for testing](#brower-used-for-testing)  
+    2.3 [List of installed Python packages](#list-of-installed-python-packages)
+    2.4 [Other packages](#other-packages)
+  3. [Instructions for gettext on macOS](#instructions-for-gettext-on-macos)  
+  3.1 [Install Homebrew](#install-homebrew)  
+  3.2 [Install gettext](#install-gettext)  
+  3.3 [Compile languages (use gettext)](#compile-languages-use-gettext)
+
+# 1 Description
+
+
+# 2 Project report - YAAS 2019
 
 Author: Otto Lindfors
 ## Implemented requirements and passed tests
@@ -77,7 +97,7 @@ makes almost all the provided tests fail.
   * 2 p.
 
   
-## Conflicts in requirements and tests
+### Conflicts in requirements and tests
 * UC1
   * (Not really an issue)
   * Constraint:  
