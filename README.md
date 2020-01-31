@@ -1,7 +1,7 @@
 # Table of contents
   * 1 [Description](#1-description) 
     * 1.1 [General](#11-general)
-    * 1.2 [RESTful API](#12-resful-api)
+    * 1.2 [RESTful API](#12-restful-api)
     * 1.3 [Multiple Languages](#13-multiple-languages)
   * 2 [Project report - YAAS 2019](#2-project-report---yaas-2019)  
     * 2.1 [Implemented requirements and passed tests](#21-implemented-requirements-and-passed-tests)  
