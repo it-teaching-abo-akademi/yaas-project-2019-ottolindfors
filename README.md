@@ -25,7 +25,7 @@ Erwins Auctions is an web application for auctioning implemetned using the Djang
 The application has an RESTful API for browsing, searching and bidding on auctions. 
 
 ## 1.3 Multiple Languages
-The application supports swithcing languages. For registered users the language preference is presistent. This means the application remember an anonymous user's language preference through the identification of the user with the session cookie. For registered users the site will be shown in the user's prefered language when signed in.
+The application supports swithcing languages. The language preference is presistent. This means the application remember an anonymous user's language preference through the identification of the user with the session cookie. For registered users the site will be shown in the user's prefered language when signed in.
 
 # 2 Project report - YAAS 2019
 
